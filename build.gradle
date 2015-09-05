@@ -1,0 +1,115 @@
+buildscript {
+	println("Using profile: ${profile}")
+	File f = new File("${project.projectDir}/gradle-${profile}.properties")
+	if (f.exists()) {
+		println("Loading $f.absolutePath")
+		Properties props = new Properties()
+		props.load(f.newDataInputStream())
+		for (String s : props.stringPropertyNames()) {
+			setProperty(s, props.getProperty(s))
+		}
+	}
+	ext.cfg = project.properties
+
+	ext {
+		springVersion = "4.2.0.RELEASE"
+		springBootVersion = "1.3.0.M4"
+	}
+
+	repositories {
+		maven { url "http://repo.jrevolt.io/content/groups/public" }
+		maven { url "http://repo.spring.io/libs-release" }
+		maven { url "http://repo.spring.io/libs-milestone" }
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+ext {
+	branch = "$git rev-parse --abbrev-ref HEAD".execute().in.text.trim()
+	branchShort = branch.replaceFirst(".*/", "")
+	commit = "$git rev-parse HEAD".execute().in.text.trim()
+	commitShort = commit.substring(0, 7)
+	tag = branch.matches("master") ? "$git describe --tags --exact-match".execute().in.text.trim() : null
+	gitDescribe = "$git describe --tags --always --long".execute().in.text.trim()
+	snapshotVersion = "${branchShort}-SNAPSHOT"
+	releaseVersion = tag ? "${tag}-${commitShort}" : null
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'maven'
+apply plugin: 'distribution'
+//apply plugin: org.springframework.boot.gradle.SpringBootPlugin
+
+group = rootProject.name
+version = "${releaseVersion ?: snapshotVersion}"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// WARNING: Gradle 1.11 uses ASM that does not yet support bytecode produced with -parameters. Tests will fail
+[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
+
+buildDir = "${rootProject.projectDir}/.build/${project.name}"
+sourceSets {
+	main { [java, resources]*.srcDir 'src/main/java'; }
+	test { [java, resources]*.srcDir 'src/test/java'; }
+}
+
+configurations {
+	deploy
+}
+
+springBoot {
+	backupSource = false
+}
+
+bootRepackage {
+	customConfiguration = "deploy"
+}
+
+dependencies {
+	compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
+	compile("org.springframework.boot:spring-boot-loader:${springBootVersion}")
+
+	deploy("org.springframework.boot:spring-boot-loader:${springBootVersion}")
+
+	//compile("org.apache.commons:commons-lang3:3.1")
+	//compile("commons-io:commons-io:2.4")
+
+	testCompile("org.springframework.boot:spring-boot-starter-test:${springBootVersion}")
+}
+
+repositories {
+	//maven { url "$cfg.repository"; }
+	maven { url "http://repo.jrevolt.io/content/groups/public" }
+	maven { url "http://repo.spring.io/libs-release" }
+	maven { url "http://repo.spring.io/libs-milestone" }
+	mavenCentral()
+}
+
+// FIXME QDH don't know yet how to get rid of distZip and distTar artifacts
+configurations.archives.artifacts.with { archives ->
+	new ArrayList(archives).each {
+		if (it.file.name.matches('.*(zip|tar)$')) {
+			remove(it)
+		}
+	}
+}
+
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: releaseVersion ? "$cfg.releases" : "$cfg.snapshots") {
+				authentication(userName: "$cfg.deploymentUserName", password: "$cfg.deploymentPassword")
+			}
+		}
+	}
+}
+
+
+
+

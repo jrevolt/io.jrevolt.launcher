@@ -1,0 +1,8 @@
+# IDEA
+/.idea
+*.iml
+
+# GRADLE
+/.gradle
+/.build
+/gradle-*.properties
