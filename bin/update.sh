@@ -24,5 +24,5 @@ ln -s $(ls -1 spring-boot-launcher-*.jar | tail -n1) springboot.jar
 ls -l springboot.jar
 chmod 640 *.jar
 
-wget -q -N https://raw.githubusercontent.com/${grepo}/${gbranch}/springboot.sh
+wget -q -N https://raw.githubusercontent.com/${grepo}/${gbranch}/bin/springboot.sh
 chmod a+x springboot.sh
