@@ -3,8 +3,8 @@
 set -eu
 
 case $(whoami) in
-	root)	dst="/etc/springboot" ;;
-	*)	dst="$HOME/.springboot" ;;
+	root)	dst="/etc/jrevolt" ;;
+	*)	dst="$HOME/.jrevolt" ;;
 esac
 
 echo "Creating $dst directory..."
@@ -16,15 +16,17 @@ branch="develop"
 echo "Downloading updater..."
 wget -q -O $dst/update.sh $repo/$branch/bin/update.sh
 
-echo "Updating launcher..."
+echo "Updating JRevolt Launcher..."
 chmod a+x $dst/update.sh
 $dst/update.sh
 
-echo "Downloading launcher script..."
-wget -q -O $dst/springboot.sh $repo/$branch/bin/springboot.sh
-chmod a+x $dst/springboot.sh
+echo "Downloading JRevolt Launcher script..."
+name="jrevolt.sh"
+wget -q -O $dst/$name $repo/$branch/bin/$name
+chmod a+x $dst/$name
 
+shortcut="jrevolt"
 if [ -d ~/bin ]; then
-	[ -L ~/bin/springboot ] || ln -s ~/.springboot/springboot.sh ~/bin/springboot
-	ls -l ~/bin/springboot
+	[ -L ~/bin/$shortcut ] || ln -s ~/.jrevolt/$shortcut ~/bin/$shortcut
+	ls -l ~/bin/$shortcut
 fi

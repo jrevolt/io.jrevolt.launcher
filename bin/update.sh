@@ -19,10 +19,10 @@ url=$(curl -sk --head "$url" \
 	| sed 's/\r//'
 )
 curl -sk --remote-name $url
-[ -L springboot.jar ] && rm springboot.jar
-ln -s $(ls -1 spring-boot-launcher-*.jar | tail -n1) springboot.jar
-ls -l springboot.jar
+[ -L io.jrevolt.launcher.jar ] && rm io.jrevolt.launcher.jar
+ln -s $(ls -1 io.jrevolt.launcher-*.jar | tail -n1) io.jrevolt.launcher.jar
+ls -l io.jrevolt.launcher.jar
 chmod 640 *.jar
 
-wget -q -N https://raw.githubusercontent.com/${grepo}/${gbranch}/bin/springboot.sh
-chmod a+x springboot.sh
+wget -q -N https://raw.githubusercontent.com/${grepo}/${gbranch}/bin/jrevolt.sh
+chmod a+x jrevolt.sh
