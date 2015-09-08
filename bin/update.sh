@@ -9,7 +9,7 @@ error() {
 
 trap 'error ${LINENO}' ERR
 
-grepo="jrevolt/io.jrevot.launcher"
+grepo="jrevolt/io.jrevolt.launcher"
 gbranch="develop"
 
 repo="${1:-http://repo.jrevolt.io}"

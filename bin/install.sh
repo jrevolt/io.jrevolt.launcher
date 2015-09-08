@@ -14,7 +14,7 @@ case $(whoami) in
 	*)	    dst="$HOME/.jrevolt" ;;
 esac
 
-echo "Creating $dst directory..."
+echo "Initializing $dst directory..."
 mkdir -p $dst
 
 repo="https://raw.githubusercontent.com/jrevolt/io.jrevolt.launcher"
