@@ -1,5 +1,6 @@
 package org.springframework.boot.launcher.mvn;
 
+import org.springframework.boot.launcher.LauncherCfg;
 import org.springframework.boot.launcher.LauncherException;
 import org.springframework.boot.launcher.util.Log;
 import org.springframework.boot.loader.archive.Archive;
@@ -151,6 +152,12 @@ public class Resolver {
      * Load list of Maven dependencies from manifest of a specified archive
      */
     private List<Artifact> getArtifacts(Archive archive) {
+
+        if (LauncherCfg.delegate.asBoolean()) {
+            Log.debug("Ignoring specified dependencies (--delegate=true)");
+            return Collections.emptyList();
+        }
+
         try {
             Manifest mf = archive.getManifest();
             String mfdeps = mf.getMainAttributes().getValue(MF_DEPENDENCIES);

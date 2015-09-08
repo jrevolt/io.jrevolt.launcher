@@ -112,6 +112,7 @@ public enum LauncherCfg {
      */
     artifact,
 
+	delegate(false),
 
     /**
      * Enable configuration and connector logging
