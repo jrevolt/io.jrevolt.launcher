@@ -139,6 +139,10 @@ public class Artifact {
 		this.resolvedSnapshotVersion = resolvedSnapshotVersion;
 	}
 
+	public String getResolvedVersion() {
+		return isSnapshot() ? getResolvedSnapshotVersion() : getVersion();
+	}
+
 	// /
 
 	public Status getStatus() {
