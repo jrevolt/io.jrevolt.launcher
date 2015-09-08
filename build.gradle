@@ -13,7 +13,7 @@ buildscript {
 
 	ext {
 		springVersion = "4.2.0.RELEASE"
-		springBootVersion = "1.3.0.M4"
+		springBootVersion = "1.3.0.BUILD-SNAPSHOT"
 	}
 
 	repositories {
@@ -47,11 +47,11 @@ apply plugin: 'distribution'
 group = rootProject.name
 version = "${releaseVersion ?: snapshotVersion}"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 // WARNING: Gradle 1.11 uses ASM that does not yet support bytecode produced with -parameters. Tests will fail
-[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
+//[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
 
 buildDir = "${rootProject.projectDir}/.build/${project.name}"
 sourceSets {
