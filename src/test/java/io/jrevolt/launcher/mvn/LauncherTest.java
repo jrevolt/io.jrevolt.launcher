@@ -1,6 +1,7 @@
 package io.jrevolt.launcher.mvn;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import io.jrevolt.launcher.AbstractTest;
 
@@ -10,9 +11,9 @@ import io.jrevolt.launcher.AbstractTest;
  */
 public class LauncherTest extends AbstractTest {
 
-	@Test
+	@Test @Ignore
 	public void test() {
-		Artifact artifact = Artifact.parse("org.springframework.boot:spring-boot-loader:1.2.0.BUILD-SNAPSHOT");
+		Artifact artifact = Artifact.parse("org.springframework.boot:spring-boot-loader:1.3.0.BUILD-SNAPSHOT");
 		Launcher launcher = new Launcher(artifact);
 		ClassLoader cl = launcher.resolve(artifact, Thread.currentThread().getContextClassLoader());
 		Assert.assertNotNull(cl);
