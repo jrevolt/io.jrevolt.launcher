@@ -21,13 +21,12 @@ import org.springframework.boot.launcher.url.UrlSupport;
 import org.springframework.boot.launcher.util.IOHelper;
 import org.springframework.boot.launcher.util.Log;
 import org.springframework.boot.launcher.util.StatusLine;
-import org.springframework.boot.loader.ExecutableArchiveLauncher;
 import org.springframework.boot.loader.LaunchedURLClassLoader;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 import org.springframework.boot.loader.jar.JarFile;
-import org.springframework.boot.loader.util.AsciiBytes;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ import java.util.SortedSet;
  *
  * @author Patrik Beno
  */
-public class Launcher extends ExecutableArchiveLauncher {
+public class Launcher {
 
     static {
         UrlSupport.init();
@@ -58,47 +57,35 @@ public class Launcher extends ExecutableArchiveLauncher {
 		this.artifact = artifact;
 	}
 
-	@Override
 	protected String getMainClass() throws Exception {
-		return (mainClass != null) ? mainClass : super.getMainClass();
+        return (mainClass != null)
+                ? mainClass
+                : (mainClass = artifact.getArchive().getManifest().getMainAttributes().getValue("Main-Class"));
 	}
 
-    @Override
-    protected void postProcessClassPathArchives(List<Archive> archives) throws Exception {
-        super.postProcessClassPathArchives(archives);
-        archives.addAll(getClassPathArchives(artifact));
+    protected List<Archive> getClassPathArchives() {
+        try {
+            return getClassPathArchives(artifact);
+        } catch (Exception e) {
+            throw new LauncherException(e);
+        }
     }
 
-    private static final AsciiBytes WEB_INF = new AsciiBytes("WEB-INF/");
 
-    private static final AsciiBytes WEB_INF_CLASSES = WEB_INF.append("classes/");
-
-    private static final AsciiBytes WEB_INF_LIB = WEB_INF.append("lib/");
-
-    private static final AsciiBytes WEB_INF_LIB_PROVIDED = WEB_INF.append("lib-provided/");
-
-    /**
-	 * Always returns false: there are no nested archives.
-	 */
-	@Override
-	protected boolean isNestedArchive(Archive.Entry entry) {
-        //return false; // unsupported / irrelevant
-        System.out.println(entry.getName());
-        if (entry.isDirectory()) {
-            return entry.getName().equals(WEB_INF_CLASSES);
-        } else {
-            return entry.getName().startsWith(WEB_INF_LIB) || entry.getName().startsWith(WEB_INF_LIB_PROVIDED);
+    protected ClassLoader createClassLoader(List<Archive> archives) throws Exception {
+        List<URL> urls = new ArrayList<URL>(archives.size());
+        for (Archive archive : archives) {
+            urls.add(archive.getUrl());
         }
-	}
+        return createClassLoader(urls.toArray(new URL[urls.size()]));
+    }
 
-    @Override
     protected ClassLoader createClassLoader(URL[] urls) throws Exception {
         return new URLClassLoader(urls, null);
     }
 
-    @Override
-	protected void launch(String[] args) {
-		try {
+	protected void launch(final String[] args) {
+        try {
 			JarFile.registerUrlProtocolHandler();
 			ClassLoader classLoader = createClassLoader(getClassPathArchives());
 			launch(args, getMainClass(), classLoader);
@@ -195,8 +182,6 @@ public class Launcher extends ExecutableArchiveLauncher {
 
                 count = resolvers.size();
 
-                this.mainClass = main.mainClass;
-
             } finally {
                 context.stopProgressMonitor();
             }
@@ -230,8 +215,7 @@ public class Launcher extends ExecutableArchiveLauncher {
         launch(args.toArray(new String[args.size()]));
     }
 
-	@Override
-	protected void launch(String[] args, String mainClass, ClassLoader classLoader) throws Exception {
+	protected void launch(final String[] args, final String mainClass, final ClassLoader classLoader) throws Exception {
 		if (!LauncherCfg.execute.asBoolean()) {
 			Log.warn("Application updated. Execution skipped (%s=false)", LauncherCfg.execute.getPropertyName());
 			return;
@@ -245,7 +229,19 @@ public class Launcher extends ExecutableArchiveLauncher {
 		}
         LauncherCfg.export();
 
-        Runnable runner = createMainMethodRunner(mainClass, args, classLoader);
+        Runnable runner = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Class.forName(mainClass, false, classLoader)
+                            .getMethod("main", String[].class)
+                            .invoke(null, (Object) args);
+                } catch (InvocationTargetException | IllegalAccessException | ClassNotFoundException | NoSuchMethodException e) {
+                    throw new LauncherException(e);
+                }
+            }
+        };
+
         Thread runnerThread = new Thread(runner);
         runnerThread.setContextClassLoader(classLoader);
         runnerThread.setName("main");
