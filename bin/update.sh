@@ -31,8 +31,9 @@ url=$(curl -sk --head "$urljar" \
 curl -sk --remote-name $url
 [ -L $fjar ] && rm $fjar
 ln -s $(ls -1 io.jrevolt.launcher-*.jar | tail -n1) $fjar
-ls -l $fjar
-chmod 640 *.jar
+chmod 640 $fjar
 
 wget -q -N $urlsh
 chmod a+x $(basename $urlsh)
+
+ls -l $fjar $(basename $urlsh)
