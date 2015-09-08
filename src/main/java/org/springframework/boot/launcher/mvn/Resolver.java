@@ -154,12 +154,7 @@ public class Resolver {
         try {
             Manifest mf = archive.getManifest();
             String mfdeps = mf.getMainAttributes().getValue(MF_DEPENDENCIES);
-            if (mfdeps == null) {
-                throw new LauncherException(String.format(
-                        "%s undefined in MANIFEST. This is not SpringBoot MvnLauncher-enabled artifact: %s",
-                        MF_DEPENDENCIES, archive));
-            }
-            String[] manifestDependencies = mfdeps.split(",");
+            String[] manifestDependencies = mfdeps != null ? mfdeps.split(",") : new String[0];
             List<Artifact> artifacts = toArtifacts(manifestDependencies);
             return artifacts;
         }
