@@ -2,6 +2,13 @@
 
 set -eu
 
+error() {
+	echo "ERROR: $*"
+	exit
+}
+
+trap 'error ${LINENO}' ERR
+
 case $(whoami) in
 	root)	dst="/etc/jrevolt" ;;
 	*)	    dst="$HOME/.jrevolt" ;;
