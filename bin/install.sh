@@ -23,7 +23,7 @@ branch="develop"
 cd $dst
 
 echo "Downloading JRevolt Updater..."
-wget -N $repo/$branch/bin/update.sh
+wget -q -N $repo/$branch/bin/update.sh
 chmod a+x update.sh
 
 echo "Updating JRevolt Launcher..."
