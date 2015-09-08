@@ -26,3 +26,5 @@ echo "Downloading JRevolt Updater..."
 wget -q -N $repo/$branch/bin/update.sh
 chmod a+x update.sh
 
+./update.sh
+
