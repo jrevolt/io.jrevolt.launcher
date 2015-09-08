@@ -125,7 +125,7 @@ public class Resolver {
 						"Cannot resolve %s (status: %s)",  getArtifact(), getArtifact().getStatus());
 			}
 
-            jar = new JarFileArchive(f);
+            jar = new JarFileArchive(f, f.toURI().toURL());
 
 			this.mainClass = jar.getMainClass();
 			this.dependencies = getArtifacts(jar);

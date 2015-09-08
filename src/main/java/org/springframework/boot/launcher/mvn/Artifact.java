@@ -189,7 +189,7 @@ public class Artifact {
 
 	Archive getArchive() {
 		try {
-			return new JarFileArchive(file);
+			return new JarFileArchive(file, file.toURI().toURL());
 		}
 		catch (IOException e) {
 			throw new RuntimeException("Cannot create archive for " + file, e);

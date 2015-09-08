@@ -173,7 +173,7 @@ public class Launcher extends ExecutableArchiveLauncher {
                     Artifact ma = r.getResolvedArtifact();
 
                     if (ma.getFile() != null && ma.getFile().exists()) {
-                        archives.add(new JarFileArchive(ma.getFile()));
+                        archives.add(new JarFileArchive(ma.getFile(), ma.getFile().toURI().toURL()));
                     }
 
                     Log.log(toLevel(ma.getStatus()),
