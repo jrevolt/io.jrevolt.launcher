@@ -1,5 +1,13 @@
 #!/bin/bash
+
 set -eu
+
+error() {
+	echo "ERROR: $*"
+	exit
+}
+
+trap 'error ${LINENO}' ERR
 
 grepo="jrevolt/io.jrevot.launcher"
 gbranch="develop"
