@@ -17,10 +17,7 @@ buildscript {
 	}
 
 	repositories {
-		maven { url "http://repo.jrevolt.io/content/groups/public" }
-//		maven { url "http://repo.spring.io/libs-release" }
-//		maven { url "http://repo.spring.io/libs-milestone" }
-//		mavenCentral()
+		maven { url "${cfg.repository}" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -32,14 +29,16 @@ ext {
 	branchShort = branch.replaceFirst(".*/", "")
 	commit = "$git rev-parse HEAD".execute().in.text.trim()
 	commitShort = commit.substring(0, 7)
-	tag = branch.matches("master") ? "$git describe --tags --exact-match".execute().in.text.trim() : null
-	gitDescribe = "$git describe --tags --always --long".execute().in.text.trim()
+	gitDescribe = "$git describe --match=${basetag} --tags --dirty".execute().in.text.trim()
 	snapshotVersion = "${branchShort}-SNAPSHOT"
-	releaseVersion = tag ? "${tag}-${commitShort}" : null
+	releaseVersion = "${gitDescribe}"
 }
 
+
 project.group = 'io.jrevolt.launcher'
-project.version = "${releaseVersion ?: snapshotVersion}"
+project.version = Boolean.valueOf("${release}") ? "${releaseVersion}" : "${snapshotVersion}"
+
+println "Building ${project.version}"
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
@@ -86,11 +85,7 @@ dependencies {
 }
 
 repositories {
-	//maven { url "$cfg.repository"; }
-	maven { url "http://repo.jrevolt.io/content/groups/public" }
-//	maven { url "http://repo.spring.io/libs-release" }
-//	maven { url "http://repo.spring.io/libs-milestone" }
-//	mavenCentral()
+	maven { url "${cfg.repository}" }
 }
 
 // FIXME QDH don't know yet how to get rid of distZip and distTar artifacts
@@ -105,7 +100,7 @@ configurations.archives.artifacts.with { archives ->
 uploadArchives {
 	repositories {
 		mavenDeployer {
-			repository(url: releaseVersion ? "$cfg.releases" : "$cfg.snapshots") {
+			repository(url: Boolean.valueOf("${release}") ? "$cfg.releases" : "$cfg.snapshots") {
 				authentication(userName: "$cfg.deploymentUserName", password: "$cfg.deploymentPassword")
 			}
 		}

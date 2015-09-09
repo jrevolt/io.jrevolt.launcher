@@ -32,6 +32,13 @@ public class Resolver {
      */
     static public final String MF_DEPENDENCIES = "Spring-Boot-Dependencies";
 
+    static public Comparator<Resolver> byFullArtifactName = new Comparator<Resolver>() {
+        @Override
+        public int compare(Resolver o1, Resolver o2) {
+            return o1.getArtifact().asString().compareTo(o2.getArtifact().asString());
+        }
+    };
+
     ResolverContext context;
 
     Artifact artifact;
@@ -44,6 +51,7 @@ public class Resolver {
     Future<Resolver> fdownload;
 
     List<Resolver> fdependencies;
+
 
     public Resolver(ResolverContext context, Artifact artifact) {
         this.context = context;
@@ -94,12 +102,6 @@ public class Resolver {
     }
 
     public SortedSet<Resolver> resolveAll() {
-        Comparator<Resolver> byFullArtifactName = new Comparator<Resolver>() {
-            @Override
-            public int compare(Resolver o1, Resolver o2) {
-                return o1.getArtifact().asString().compareTo(o2.getArtifact().asString());
-            }
-        };
         SortedSet<Resolver> all = new TreeSet<Resolver>(byFullArtifactName);
         resolveMainClassAndDependencies();
         all.add(this);
@@ -130,7 +132,7 @@ public class Resolver {
 
             jar = new JarFile(f);
 
-			this.mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
+			this.mainClass = getManifestAttribute(jar, "Main-Class");
 			this.dependencies = getArtifacts(jar);
 
             for (Artifact ma : dependencies) {
@@ -147,6 +149,17 @@ public class Resolver {
         }
     }
 
+    private String getManifestAttribute(JarFile jar, String name) {
+        try {
+            Manifest mf = jar.getManifest();
+            if (mf == null) { return null; }
+
+            return mf.getMainAttributes().getValue(name);
+        } catch (IOException e) {
+            throw new LauncherException(e);
+        }
+    }
+
     /**
      * Load list of Maven dependencies from manifest of a specified archive
      */
@@ -157,16 +170,10 @@ public class Resolver {
             return Collections.emptyList();
         }
 
-        try {
-            Manifest mf = archive.getManifest();
-            String mfdeps = mf.getMainAttributes().getValue(MF_DEPENDENCIES);
-            String[] manifestDependencies = mfdeps != null ? mfdeps.split(",") : new String[0];
-            List<Artifact> artifacts = toArtifacts(manifestDependencies);
-            return artifacts;
-        }
-        catch (IOException e) {
-            throw new LauncherException(e, "Cannot resolve artifacts for archive " + archive);
-        }
+        String mfdeps = getManifestAttribute(archive, MF_DEPENDENCIES);
+        String[] manifestDependencies = mfdeps != null ? mfdeps.split(",") : new String[0];
+        List<Artifact> artifacts = toArtifacts(manifestDependencies);
+        return artifacts;
     }
 
     // parses Maven URIs and converts them into list of Maven artifacts

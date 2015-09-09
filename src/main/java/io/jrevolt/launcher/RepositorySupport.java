@@ -6,9 +6,11 @@ import io.jrevolt.launcher.mvn.ResolverContext;
 import io.jrevolt.launcher.util.Log;
 import io.jrevolt.launcher.util.StatusLine;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -23,12 +25,18 @@ public class RepositorySupport {
     }
 
     static public List<Artifact> resolve(Artifact mvnartifact) {
+        return resolve(mvnartifact, Collections.<Artifact>emptyList());
+    }
 
-        List<Artifact> artifacts = new LinkedList<Artifact>();
+    static public List<Artifact> resolve(Artifact mvnartifact, List<Artifact> extras) {
+
+        List<Artifact> artifacts = new LinkedList<>();
 
         ResolverContext context = new ResolverContext(mvnartifact);
         try {
-            Resolver main = new Resolver(context, mvnartifact);
+//            Resolver main = new Resolver(context, mvnartifact);
+//            List<Resolver> extras = new LinkedList<>();
+//            for (Artifact a : artifacts) { extras.add(new Resolver(context, a)); }
 
             int count = 0;
             int size = 0;
@@ -40,8 +48,14 @@ public class RepositorySupport {
             try {
                 context.startProgressMonitor();
 
-                // tiny single line but this is where all happens
-                SortedSet<Resolver> resolvers = main.resolveAll();
+                // resolveAll() fires async. process
+                SortedSet<Resolver> resolvers = new TreeSet<>(Resolver.byFullArtifactName);
+                if (mvnartifact != null) {
+                    resolvers.addAll(new Resolver(context, mvnartifact).resolveAll());
+                }
+                for (Artifact a : extras) {
+                    resolvers.addAll(new Resolver(context, a).resolveAll());
+                }
 
                 Log.debug("Dependencies (alphabetical):");
 

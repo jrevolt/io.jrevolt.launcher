@@ -245,11 +245,15 @@ public class Artifact {
 	}
 
 	public String asString() {
-		String resolvedVersion = Objects.toString(resolvedSnapshotVersion, getVersion());
+		return asString(true);
+	}
+
+	public String asString(boolean resolved) {
+		String version = resolved ? Objects.toString(resolvedSnapshotVersion, getVersion()) : getVersion();
         StringBuilder sb = new StringBuilder()
                 .append(getGroupId()).append(':')
                 .append(getArtifactId()).append(':')
-                .append(resolvedVersion).append(':')
+                .append(version).append(':')
                 .append(getPackaging());
         if (getClassifier() != null) {
             sb.append(':').append(getClass());
