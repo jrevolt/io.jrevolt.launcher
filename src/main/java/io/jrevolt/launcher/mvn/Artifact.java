@@ -47,7 +47,7 @@ public class Artifact {
 	// used for debug logging, and
 	// the output looks better in CamelCase than UPPER_CASE.
 	static public enum Status {
-		Resolving, Resolved, NotModified, Downloadable, Downloading, Downloaded, Updated, Cached, Offline, NotFound, Invalid
+		Undefined, Resolving, Resolved, NotModified, Downloadable, Downloading, Downloaded, Updated, Cached, Offline, NotFound, Invalid
 	}
 
 	static public Artifact parse(String mvnuri) {
@@ -85,7 +85,7 @@ public class Artifact {
 
 	private String resolvedSnapshotVersion; // e.g. 1.0-SNAPSHOT (logical) -> 1.0.20140131.123456 (timestamped)
 
-	private Status status; // resolution status
+	private Status status = Status.Undefined; // resolution status
 
 	private URL source; // origin
 

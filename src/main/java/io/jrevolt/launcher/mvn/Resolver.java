@@ -3,8 +3,6 @@ package io.jrevolt.launcher.mvn;
 import io.jrevolt.launcher.LauncherCfg;
 import io.jrevolt.launcher.LauncherException;
 import io.jrevolt.launcher.util.Log;
-import org.springframework.boot.loader.archive.Archive;
-import org.springframework.boot.loader.archive.JarFileArchive;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +16,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import static io.jrevolt.launcher.util.IOHelper.close;
@@ -94,7 +93,7 @@ public class Resolver {
         return resolvers;
     }
 
-    SortedSet<Resolver> resolveAll() {
+    public SortedSet<Resolver> resolveAll() {
         Comparator<Resolver> byFullArtifactName = new Comparator<Resolver>() {
             @Override
             public int compare(Resolver o1, Resolver o2) {
@@ -116,8 +115,11 @@ public class Resolver {
         if (this.dependencies != null) {
             return;
         }
-        JarFileArchive jar = null;
+        JarFile jar = null;
         try {
+            context.main = getArtifact();
+            context.artifacts.add(getArtifact());
+
             File f = download().get().getArtifact().getFile();
 
 			if (f == null) {
@@ -126,14 +128,11 @@ public class Resolver {
 						"Cannot resolve %s (status: %s)",  getArtifact(), getArtifact().getStatus());
 			}
 
-            jar = new JarFileArchive(f, f.toURI().toURL());
+            jar = new JarFile(f);
 
-			this.mainClass = jar.getMainClass();
+			this.mainClass = jar.getManifest().getMainAttributes().getValue("Main-Class");
 			this.dependencies = getArtifacts(jar);
 
-            // propagate all to context
-			context.main = getArtifact();
-            context.artifacts.add(artifact);
             for (Artifact ma : dependencies) {
                 ma.setStatus(Artifact.Status.Resolving);
                 context.artifacts.add(ma);
@@ -151,7 +150,7 @@ public class Resolver {
     /**
      * Load list of Maven dependencies from manifest of a specified archive
      */
-    private List<Artifact> getArtifacts(Archive archive) {
+    private List<Artifact> getArtifacts(JarFile archive) {
 
         if (LauncherCfg.delegate.asBoolean()) {
             Log.debug("Ignoring specified dependencies (--delegate=true)");

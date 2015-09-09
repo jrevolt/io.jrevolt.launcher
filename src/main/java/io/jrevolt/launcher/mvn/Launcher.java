@@ -17,10 +17,10 @@ package io.jrevolt.launcher.mvn;
 
 import io.jrevolt.launcher.LauncherCfg;
 import io.jrevolt.launcher.LauncherException;
+import io.jrevolt.launcher.RepositorySupport;
 import io.jrevolt.launcher.url.UrlSupport;
 import io.jrevolt.launcher.util.IOHelper;
 import io.jrevolt.launcher.util.Log;
-import io.jrevolt.launcher.util.StatusLine;
 import org.springframework.boot.loader.LaunchedURLClassLoader;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.SortedSet;
 
 /**
  * Specialized implementation of the {@code Launcher} that intelligently downloads
@@ -132,83 +131,12 @@ public class Launcher {
     ///
 
 	protected List<Archive> getClassPathArchives(Artifact mvnartifact) throws Exception {
-
+        List<Artifact> artifacts = RepositorySupport.resolve(mvnartifact);
         List<Archive> archives = new LinkedList<Archive>();
-
-        ResolverContext context = new ResolverContext(mvnartifact);
-        try {
-            Resolver main = new Resolver(context, mvnartifact);
-
-            int count = 0;
-            int size = 0;
-            int downloaded = 0;
-            int errors = 0;
-            int warnings = 0;
-            int requests = 0;
-
-            try {
-                context.startProgressMonitor();
-
-                // tiny single line but this is where all happens
-                SortedSet<Resolver> resolvers = main.resolveAll();
-
-                Log.debug("Dependencies (alphabetical):");
-
-                for (Resolver r : resolvers) {
-
-                    // this may block until resolved artifact is available
-                    Artifact ma = r.getResolvedArtifact();
-
-                    if (ma.getFile() != null && ma.getFile().exists()) {
-                        archives.add(new JarFileArchive(ma.getFile(), ma.getFile().toURI().toURL()));
-                    }
-
-                    Log.log(toLevel(ma.getStatus()),
-                            "- %-12s: %-80s %s",
-                            ma.getStatus(), ma,
-                            ma.getRepositoryId() != null
-                                    ? String.format("(%4dKB @%s)", ma.getFile() != null && ma.getFile().exists() ? ma.getFile().length() / 1024 : 0, ma.getRepositoryId())
-                                    : ""
-                    );
-                    // update some stats
-                    if (ma.isError()) { errors++; }
-                    if (ma.isWarning()) { warnings++; }
-                    if (ma.getFile() != null && ma.getFile().exists()) {
-                        size += ma.getFile().length();
-                    }
-                    downloaded += ma.downloaded;
-                    requests += ma.requests;
-                }
-
-                count = resolvers.size();
-
-            } finally {
-                context.stopProgressMonitor();
-            }
-
-            // if enabled, print some final report
-            if (!LauncherCfg.quiet.asBoolean()) {
-                long elapsed = System.currentTimeMillis() - context.created;
-                Log.info(String.format(
-                        "Summary: %d archives, %d KB total (resolved in %d msec, downloaded %d KB in %d requests, %d KBps). Warnings/Errors: %d/%d.",
-                        count, size / 1024, elapsed, downloaded / 1024, requests,
-                        downloaded / 1024 * 1000 / elapsed,
-                        warnings, errors));
-            }
-
-            // if there are errors and fail-on-error property has not been reset, fail
-            if (LauncherCfg.execute.asBoolean() && errors > 0 && LauncherCfg.failOnError.asBoolean()) {
-                throw new LauncherException(String.format(
-                        "%d errors resolving dependencies. Use --%s to view details or --%s to ignore these errors and continue",
-                        errors, LauncherCfg.debug.name(), LauncherCfg.failOnError.name()));
-            }
-
-            return archives;
-
-        } finally {
-            context.close();
-            StatusLine.resetLine();
+        for (Artifact a : artifacts) {
+            archives.add(new JarFileArchive(a.getFile()));
         }
+        return archives;
     }
 
     public void launch(Queue<String> args) throws Exception {

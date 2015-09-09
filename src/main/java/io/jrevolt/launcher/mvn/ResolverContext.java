@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ResolverContext implements AutoCloseable {
 
-    long created = System.currentTimeMillis();
+    public final long created = System.currentTimeMillis();
 
     File cache = LauncherCfg.cache.asFile();
 
@@ -108,6 +108,7 @@ public class ResolverContext implements AutoCloseable {
                     long size = 0;
                     for (Artifact ma : artifacts) {
                         switch (ma.getStatus()) {
+                            case Undefined:
                             case Resolving:
                                 break;
                             case Resolved:
