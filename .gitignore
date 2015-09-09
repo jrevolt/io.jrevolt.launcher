@@ -6,3 +6,7 @@
 /.gradle
 /.build
 /gradle-*.properties
+
+# Vagrant
+/Vagrantfile
+/.vagrant
