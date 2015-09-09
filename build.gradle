@@ -1,6 +1,6 @@
 buildscript {
 	println("Using profile: ${profile}")
-	File f = new File("${project.projectDir}/gradle-${profile}.properties")
+	File f = new File("${rootProject.projectDir}/gradle-${profile}.properties")
 	if (f.exists()) {
 		println("Loading $f.absolutePath")
 		Properties props = new Properties()
@@ -18,9 +18,9 @@ buildscript {
 
 	repositories {
 		maven { url "http://repo.jrevolt.io/content/groups/public" }
-		maven { url "http://repo.spring.io/libs-release" }
-		maven { url "http://repo.spring.io/libs-milestone" }
-		mavenCentral()
+//		maven { url "http://repo.spring.io/libs-release" }
+//		maven { url "http://repo.spring.io/libs-milestone" }
+//		mavenCentral()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -38,14 +38,15 @@ ext {
 	releaseVersion = tag ? "${tag}-${commitShort}" : null
 }
 
+project.group = 'io.jrevolt.launcher'
+project.version = "${releaseVersion ?: snapshotVersion}"
+
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'maven'
 apply plugin: 'distribution'
 //apply plugin: org.springframework.boot.gradle.SpringBootPlugin
 
-group = rootProject.name
-version = "${releaseVersion ?: snapshotVersion}"
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -58,6 +59,7 @@ sourceSets {
 	main { [java, resources]*.srcDir 'src/main/java'; }
 	test { [java, resources]*.srcDir 'src/test/java'; }
 }
+
 
 configurations {
 	deploy
@@ -86,9 +88,9 @@ dependencies {
 repositories {
 	//maven { url "$cfg.repository"; }
 	maven { url "http://repo.jrevolt.io/content/groups/public" }
-	maven { url "http://repo.spring.io/libs-release" }
-	maven { url "http://repo.spring.io/libs-milestone" }
-	mavenCentral()
+//	maven { url "http://repo.spring.io/libs-release" }
+//	maven { url "http://repo.spring.io/libs-milestone" }
+//	mavenCentral()
 }
 
 // FIXME QDH don't know yet how to get rid of distZip and distTar artifacts

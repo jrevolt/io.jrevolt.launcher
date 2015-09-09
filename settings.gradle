@@ -1,10 +1,5 @@
 rootProject.name = 'io.jrevolt.launcher'
 
-//include 'launcher'
-
-//rootProject.children.each { it.name = "$rootProject.name.$it.name" }
-
-
 
 
 
