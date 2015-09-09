@@ -71,7 +71,7 @@ public enum LauncherCfg {
 	/**
 	 * Particular application name, typically base name of the script
 	 */
-	appname("SpringBootApp"),
+	appname("JavaApp"),
 
 	/**
 	 * Properties containing MvnLauncher user-specific configuration defaults; the file,
@@ -83,12 +83,12 @@ public enum LauncherCfg {
 	 * properties
 	 */
 	defaults(list(
-			"file:springboot.properties", // current folder
-			"file:///${MvnLauncher.apphome}/${MvnLauncher.appname}.properties", // application defaults
-			"file:///${MvnLauncher.apphome}/springboot.properties", // application home folder
-			"file:///${user.home}/.springboot/defaults.properties", // user defaults
-			"file:///etc/springboot/defaults.properties", // system defaults // todo: what about windows?
-			"classpath:META-INF/springboot/defaults.properties" // application/library defaults
+			"file:jrevolt.properties", // current folder
+			"file:///${jrevolt.launcher.apphome}/${jrevolt.launcher.appname}.properties", // specific application defaults
+			"file:///${jrevolt.launcher.apphome}/jrevolt.properties", // application home folder
+			"file:///${user.home}/.jrevolt/defaults.properties", // user defaults
+			"file:///etc/jrevolt/defaults.properties", // system defaults // todo: what about windows?
+			"classpath:META-INF/jrevolt/defaults.properties" // application/library defaults
 	)),
 
     /**
@@ -101,7 +101,7 @@ public enum LauncherCfg {
     /**
      * Launcher cache directory. Defaults to {@code ${user.home}/.springboot/cache}
      */
-    cache("${user.home}/.springboot/cache"),
+    cache("${user.home}/.jrevolt/cache"),
 
     /**
      * Maven artifact entrypoint URI in form {@code groupId:artifactId:version}. If

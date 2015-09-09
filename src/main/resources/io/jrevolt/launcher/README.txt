@@ -1,6 +1,6 @@
 Usage:
-  java -jar springboot.jar [launcher-options] <artifact> [application-arguments]
-  java -jar springboot.jar [launcher-options] <tool> [command-options]
+  java -jar jrevolt.jar [launcher-options] <artifact> [application-arguments]
+  java -jar jrevolt.jar [launcher-options] <tool> [command-options]
 Artifact:
   <groupId>:<artifactId>:<version>[:<packaging>[:<classifier>]]
 Tools:
@@ -42,15 +42,10 @@ Launcher Options:
   save               : true
   artifact           : Artifact URI (group:artifact:version)
 See:
-  https://github.com/patrikbeno/spring-boot/wiki/About
-  https://github.com/patrikbeno/spring-boot/wiki/Getting-Started
-  https://github.com/patrikbeno/spring-boot/wiki/Reference
-Hint:
-  Configure your `default` repository using `--MvnLauncher.save=true`
-  and `--MvnLauncher.(url|username|password)` options.
-  For non-default repository, specify also `--MvnLauncher.repository=<ID>`.
-  Once configured, you can switch between repositories using `--MvnLauncher.repository=<ID>` option.
-Generate Certificate and Private Key:
+  https://github.com/jrevolt/io.jrevolt.launcher/wiki/About
+  https://github.com/jrevolt/io.jrevolt.launcher/wiki/Getting-Started
+  https://github.com/jrevolt/io.jrevolt.launcher/wiki/Reference
+Generate Certificate and Private Key for sensitive data encryption:
   $ mkdir ~/.springboot
   $ openssl genrsa | openssl pkcs8 -topk8 -nocrypt -out ~/.springboot/vault.key
   $ subject="/CN=$(whoami)@$(hostname)/OU=MyDepartment/O=MyOrganization/L=MyLocation/C=US"
