@@ -157,6 +157,10 @@ public class Launcher {
 		}
         LauncherCfg.export();
 
+        if (mainClass == null) {
+            throw new LauncherException("Missing Main-Class in manifest");
+        }
+
         Runnable runner = new Runnable() {
             @Override
             public void run() {

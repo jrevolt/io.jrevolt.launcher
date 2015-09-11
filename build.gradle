@@ -97,6 +97,15 @@ configurations.archives.artifacts.with { archives ->
 	}
 }
 
+jar {
+	manifest {
+		attributes(
+				"Implementation-Version": "${project.version}",
+				"Maven-Dependencies": "TODO"
+		)
+	}
+}
+
 uploadArchives {
 	repositories {
 		mavenDeployer {
