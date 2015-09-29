@@ -256,7 +256,7 @@ public class Artifact {
                 .append(version).append(':')
                 .append(getPackaging());
         if (getClassifier() != null) {
-            sb.append(':').append(getClass());
+            sb.append(':').append(getClassifier());
         }
         return sb.toString();
 	}
