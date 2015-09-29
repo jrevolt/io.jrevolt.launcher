@@ -30,7 +30,7 @@ public class Resolver {
      * Name of the manifest attribute containing the comma-delimited list Maven URIs
      * (runtime dependencies, provided build-time)
      */
-    static public final String MF_DEPENDENCIES = "Spring-Boot-Dependencies";
+    static public final String MF_DEPENDENCIES = "Maven-Dependencies";
 
     static public Comparator<Resolver> byFullArtifactName = new Comparator<Resolver>() {
         @Override
