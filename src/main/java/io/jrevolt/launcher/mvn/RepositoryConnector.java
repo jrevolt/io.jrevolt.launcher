@@ -219,7 +219,7 @@ public class RepositoryConnector {
             if (!available) {
                 return parent != null
                         ? parent.resolve(artifact)
-                        : resource(artifact, Artifact.Status.NotFound, url, null, null);
+                        : resource(artifact, Artifact.Status.NotFound, url, null, new FileNotFoundException(url.toString()));
             }
 
             final long lastModified = con.getLastModified();
