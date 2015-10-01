@@ -24,10 +24,7 @@ fjar="io.jrevolt.launcher.jar"
 echo "Updating JRevolt Launcher..."
 cd $(dirname $0)
 
-url=$(curl -sk --head "$urljar" \
-	| perl -n -e '/^Location: (.*)$/ && print "$1\n"' \
-	| sed 's/\r//'
-)
+url=$(curl -sk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
 curl -sk --remote-name $url
 [ -L $fjar ] && rm $fjar
 ln -s $(ls -1 io.jrevolt.launcher-*.jar | tail -n1) $fjar
