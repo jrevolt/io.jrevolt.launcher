@@ -29,9 +29,11 @@ ext {
 	branchShort = branch.replaceFirst(".*/", "")
 	commit = "$git rev-parse HEAD".execute().in.text.trim()
 	commitShort = commit.substring(0, 7)
-	gitDescribe = "$git describe --match=${basetag} --tags --dirty".execute().in.text.trim()
+	//gitDescribe = "$git describe --match=${basetag} --tags --dirty".execute().in.text.trim()
+	gitDescribe = "$git describe --always --dirty".execute().in.text.trim()
 	snapshotVersion = "${branchShort}-SNAPSHOT"
 	releaseVersion = "${gitDescribe}"
+	scmRevision = "${branchShort}-${gitDescribe}"
 }
 
 
@@ -101,7 +103,7 @@ jar {
 	manifest {
 		attributes(
 				"Implementation-Version": "${project.version}",
-				"Maven-Dependencies": "TODO"
+				"SCM-Revision": "${scmRevision}"
 		)
 	}
 }
