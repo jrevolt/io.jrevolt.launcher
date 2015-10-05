@@ -76,10 +76,18 @@ public class Artifact {
 		String mainclass = get(it, 5, null);
 
 		if (g == null || a == null || v == null) {
-			return null;
+			return tryFile(new File(mvnuri));
 		}
 
 		return new Artifact(g, a, v, packaging, classifier, mainclass);
+	}
+
+	static public Artifact tryFile(File f) {
+		if (!f.exists()) { return null; }
+		Artifact a = new Artifact(null, null, null, null, null, null);
+		a.file = f;
+		a.status = Status.Offline;
+		return a;
 	}
 
 	static private String get(String[] strings, int idx, String dflt) {
@@ -121,7 +129,7 @@ public class Artifact {
 		this.packaging = packaging;
 		this.classifier = classifier;
 		this.mainClass = mainClass;
-		fixupExplicitSnapshotVersion();
+		if (version != null) { fixupExplicitSnapshotVersion(); }
 	}
 
 	public String getGroupId() {
@@ -266,6 +274,9 @@ public class Artifact {
 	}
 
 	public String asString(boolean resolved) {
+		if (groupId == null && artifactId == null && file != null) {
+			return file.toURI().toString();
+		}
 		String version = resolved ? Objects.toString(resolvedSnapshotVersion, getVersion()) : getVersion();
         StringBuilder sb = new StringBuilder()
                 .append(getGroupId()).append(':')

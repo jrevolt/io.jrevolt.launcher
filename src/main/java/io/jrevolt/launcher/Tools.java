@@ -69,7 +69,14 @@ public class Tools {
 			throw new LauncherException("Expected artifactId");
 		}
 		LauncherCfg.configure();
-		new Launcher(Artifact.parse(artifact)).launch(cmdline.remainder());
+
+		Artifact a = Artifact.tryparse(artifact);
+
+		if (a == null) {
+			throw new LauncherException(null, "Invalid artifact URI or no such file: %s", artifact);
+		}
+
+		new Launcher(a).launch(cmdline.remainder());
 	}
 
 	@Command

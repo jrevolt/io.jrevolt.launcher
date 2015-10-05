@@ -1,9 +1,9 @@
 Usage:
-  java -jar jrevolt.jar [launcher-options] <artifact-uri> [application-arguments]
-  java -jar jrevolt.jar [launcher-options] <tool> [application-arguments]
-Maven URI:
-  mvn:<groupId>:<artifactId>:<version>[:<packaging>[:<classifier>[:<mainclass>]]]
-  file://
+  java -jar jrevolt.jar [launcher-options] <artifact> [application-arguments]
+  java -jar jrevolt.jar [launcher-options] <tool> [tool-options]
+Artifact:
+  <groupId>:<artifactId>:<version>[:<packaging>[:<classifier>[:<mainclass>]]]
+  <file-path>
 Tool:
   repository --id=<alias> --url=<URL> --username=<username>
   encrypt    --key --value
