@@ -18,6 +18,7 @@ package io.jrevolt.launcher;
 import io.jrevolt.launcher.url.UrlSupport;
 import io.jrevolt.launcher.util.Log;
 import io.jrevolt.launcher.util.StatusLine;
+
 import org.springframework.boot.loader.util.SystemPropertyUtils;
 
 import java.io.File;
@@ -36,8 +37,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePlaceholders;
 
 /**
@@ -101,6 +101,9 @@ public enum LauncherCfg {
      */
     cache("${user.home}/.jrevolt/cache"),
 
+	/**
+	 * Resolve main artifact and execute it as regular jar file (no dependencies resolution)
+	 */
 	delegate(false),
 
     /**

@@ -165,10 +165,10 @@ public class Resolver {
      */
     private List<Artifact> getArtifacts(JarFile archive) {
 
-        if (LauncherCfg.delegate.asBoolean()) {
-            Log.debug("Ignoring specified dependencies (--delegate=true)");
-            return Collections.emptyList();
-        }
+		 if (LauncherCfg.delegate.asBoolean()) {
+			 Log.debug("Ignoring specified dependencies (--delegate=true)");
+			 return Collections.emptyList();
+		 }
 
         String mfdeps = getManifestAttribute(archive, MF_DEPENDENCIES);
         String[] manifestDependencies = mfdeps != null ? mfdeps.split(",") : new String[0];
