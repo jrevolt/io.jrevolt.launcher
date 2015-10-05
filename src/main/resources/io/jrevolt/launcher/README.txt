@@ -1,13 +1,15 @@
 Usage:
-  java -jar jrevolt.jar [launcher-options] <artifact> [application-arguments]
-  java -jar jrevolt.jar [launcher-options] <tool> [command-options]
-Artifact:
-  <groupId>:<artifactId>:<version>[:<packaging>[:<classifier>]]
-Tools:
-  repository        --id=<alias> --url=<URL> --username=<username>
-  encrypt           --key --value
-  decrypt           --key
-  version
+  java -jar jrevolt.jar [launcher-options] <artifact-uri> [application-arguments]
+  java -jar jrevolt.jar [launcher-options] <tool> [application-arguments]
+Maven URI:
+  mvn:<groupId>:<artifactId>:<version>[:<packaging>[:<classifier>[:<mainclass>]]]
+  file://
+Tool:
+  repository --id=<alias> --url=<URL> --username=<username>
+  encrypt    --key --value
+  decrypt    --key
+  config             : Show configuration
+  version            : Show version
 Launcher Options:
   apphome            : Application home directory
   appname            : Application name

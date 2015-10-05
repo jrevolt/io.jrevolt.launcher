@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -50,21 +51,25 @@ public class Launcher {
 
 	private Artifact artifact;
 
-	private String mainClass;
+    private String mainClass;
 
 	public Launcher(Artifact artifact) {
 		this.artifact = artifact;
-	}
+        this.mainClass = artifact.getMainClass();
+    }
 
 	protected String getMainClass() throws Exception {
-        return (mainClass != null)
-                ? mainClass
-                : (mainClass = artifact.getArchive().getManifest().getMainAttributes().getValue("Main-Class"));
+        if (artifact.getMainClass() == null) {
+            mainClass = artifact.getArchive().getManifest().getMainAttributes().getValue("Main-Class");
+        }
+        return mainClass;
 	}
 
     protected List<Archive> getClassPathArchives() {
         try {
             return getClassPathArchives(artifact);
+        } catch (LauncherException e) {
+            throw e;
         } catch (Exception e) {
             throw new LauncherException(e);
         }
@@ -83,11 +88,16 @@ public class Launcher {
         return new URLClassLoader(urls, null);
     }
 
-	protected void launch(final String[] args) {
+	protected void launch(String[] args) {
         try {
 			JarFile.registerUrlProtocolHandler();
 			ClassLoader classLoader = createClassLoader(getClassPathArchives());
-			launch(args, getMainClass(), classLoader);
+            String main = getMainClass();
+            if (main == null && args.length>0) {
+                main = args[0];
+                args = Arrays.copyOfRange(args, 1, args.length);
+            }
+            launch(args, main, classLoader);
 		}
 		catch (LauncherException e) {
 			throw e;

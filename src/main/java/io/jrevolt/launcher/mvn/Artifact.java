@@ -26,7 +26,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -61,27 +60,40 @@ public class Artifact {
 		}
 		return a;
 	}
-	
+
+	/**
+	 * group:artifact:version[:packaging[:classifier[:mainclass]]]
+	 * @param mvnuri
+	 * @return
+	 */
 	static public Artifact tryparse(String mvnuri) {
-		StringTokenizer st = new StringTokenizer(mvnuri, ":");
-		String g = st.hasMoreTokens() ? st.nextToken() : null;
-		String a = st.hasMoreTokens() ? st.nextToken() : null;
-		String v = st.hasMoreTokens() ? st.nextToken() : null;
-		String packaging = st.hasMoreTokens() ? st.nextToken() : "jar";
-		String classifier = st.hasMoreTokens() ? st.nextToken() : null;
+		String[] it = mvnuri.split(":");
+		String g = get(it, 0, null);
+		String a = get(it, 1, null);
+		String v = get(it, 2, null);
+		String packaging = get(it, 3, "jar");
+		String classifier = get(it, 4, null);
+		String mainclass = get(it, 5, null);
 
 		if (g == null || a == null || v == null) {
 			return null;
 		}
 
-		return new Artifact(g, a, v, packaging, classifier);
+		return new Artifact(g, a, v, packaging, classifier, mainclass);
 	}
+
+	static private String get(String[] strings, int idx, String dflt) {
+		String s = strings.length > idx ? strings[idx] : null;
+		return s != null && s.length()>0 ? s : dflt;
+	}
+
 
 	private String groupId;
 	private String artifactId;
 	private String version;
 	private String packaging;
 	private String classifier;
+	private String mainClass;
 
 	private String resolvedSnapshotVersion; // e.g. 1.0-SNAPSHOT (logical) -> 1.0.20140131.123456 (timestamped)
 
@@ -102,12 +114,13 @@ public class Artifact {
     public int requests;
 
 
-	protected Artifact(String groupId, String artifactId, String version, String packaging, String classifier) {
+	protected Artifact(String groupId, String artifactId, String version, String packaging, String classifier, String mainClass) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.packaging = packaging;
 		this.classifier = classifier;
+		this.mainClass = mainClass;
 		fixupExplicitSnapshotVersion();
 	}
 
@@ -129,6 +142,10 @@ public class Artifact {
 
 	public String getClassifier() {
 		return classifier;
+	}
+
+	public String getMainClass() {
+		return mainClass;
 	}
 
 	public String getResolvedSnapshotVersion() {

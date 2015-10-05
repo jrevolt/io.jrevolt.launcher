@@ -15,7 +15,6 @@
  */
 package io.jrevolt.launcher;
 
-import io.jrevolt.launcher.mvn.Artifact;
 import io.jrevolt.launcher.url.UrlSupport;
 import io.jrevolt.launcher.util.Log;
 import io.jrevolt.launcher.util.StatusLine;
@@ -102,15 +101,6 @@ public enum LauncherCfg {
      * Launcher cache directory. Defaults to {@code ${user.home}/.springboot/cache}
      */
     cache("${user.home}/.jrevolt/cache"),
-
-    /**
-     * Maven artifact entrypoint URI in form {@code groupId:artifactId:version}. If
-     * defined, launcher resolves it and uses its metadata to configure classpath and main
-     * class. If undefined (default), launcher proceeds as usual, using its own archive to
-     * load dependencies and resolve main class. This option enables using SpringBoot
-     * MvnLauncher as generic repo-based application launcher.
-     */
-    artifact,
 
 	delegate(false),
 
@@ -237,7 +227,7 @@ public enum LauncherCfg {
 		return System.getProperty(pname, dflt);
 	}
 
-	void set(String value) {
+	public void set(String value) {
 		if (value != null) {
 			System.getProperties().setProperty(getPropertyName(), value);
 		}

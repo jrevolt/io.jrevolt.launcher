@@ -53,4 +53,23 @@ public class ArtifactTest {
 		assertEquals("jar", ma.getPackaging());
 	}
 
+	@Test
+	public void parseMainClass() throws Exception {
+		Artifact ma = Artifact.parse("mygroup:myartifact:1.0-SNAPSHOT:jar:classes:com.example.MainClass");
+		assertEquals("mygroup", ma.getGroupId());
+		assertEquals("myartifact", ma.getArtifactId());
+		assertEquals("1.0-SNAPSHOT", ma.getVersion());
+		assertEquals("jar", ma.getPackaging());
+		assertEquals("classes", ma.getClassifier());
+		assertEquals("com.example.MainClass", ma.getMainClass());
+	}
+
+	@Test
+	public void parseMainClassShort() throws Exception {
+		Artifact ma = Artifact.parse("mygroup:myartifact:1.0-SNAPSHOT:::com.example.MainClass");
+		assertEquals("jar", ma.getPackaging());
+		assertEquals(null, ma.getClassifier());
+		assertEquals("com.example.MainClass", ma.getMainClass());
+	}
+
 }
