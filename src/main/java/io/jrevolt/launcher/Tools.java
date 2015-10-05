@@ -157,7 +157,7 @@ public class Tools {
 		password = Vault.instance().encrypt(password);
 
 		Formatter f = new Formatter(System.out);
-		f.format("# springboot.properties%n");
+		f.format("# jrevolt.properties%n");
 		f.format(Repository.P_URL, id).format("=%s%n", url);
 		if (username != null) { f.format(Repository.P_USERNAME, id).format("=%s%n", username); }
 		if (password != null) { f.format(Repository.P_PASSWORD, id).format("=%s%n", password); }
@@ -166,8 +166,7 @@ public class Tools {
 
 	@Command
 	void version(CommandLine cmdline) {
-		String version = org.springframework.boot.loader.Launcher.class.getPackage().getImplementationVersion();
-		System.out.printf("SpringBoot %s%n", (version != null ? version : "(unknown version)"));
+		System.out.println(Version.version().getVersionString());
 	}
 
 	@Command

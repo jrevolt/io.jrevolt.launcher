@@ -1,8 +1,8 @@
 package io.jrevolt.launcher;
 
+import io.jrevolt.launcher.vault.Vault;
 import org.junit.After;
 import org.junit.Before;
-import io.jrevolt.launcher.vault.Vault;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,11 +24,11 @@ public abstract class AbstractTest {
         key = Paths.get(System.getProperty("java.io.tmpdir"), uuid.toString() + ".key");
         Files.copy(AbstractTest.class.getResourceAsStream("/test.crt"), crt, StandardCopyOption.REPLACE_EXISTING);
         Files.copy(AbstractTest.class.getResourceAsStream("/test.key"), key, StandardCopyOption.REPLACE_EXISTING);
-        System.setProperty("MvnLauncher.defaults", "classpath:MvnLauncherCfg.properties");
+        System.setProperty("jrevolt.launcher.defaults", "classpath:LauncherCfg.properties");
         LauncherCfg.configure();
 
-        System.setProperty("springboot.vault.user.certFile", crt.toString());
-        System.setProperty("springboot.vault.user.keyFile", key.toString());
+        System.setProperty("jrevolt.vault.user.certFile", crt.toString());
+        System.setProperty("jrevolt.vault.user.keyFile", key.toString());
         Vault.instance();
     }
 

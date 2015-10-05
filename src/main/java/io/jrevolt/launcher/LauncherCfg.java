@@ -18,7 +18,6 @@ package io.jrevolt.launcher;
 import io.jrevolt.launcher.url.UrlSupport;
 import io.jrevolt.launcher.util.Log;
 import io.jrevolt.launcher.util.StatusLine;
-import org.springframework.boot.loader.Launcher;
 import org.springframework.boot.loader.util.SystemPropertyUtils;
 
 import java.io.File;
@@ -42,13 +41,13 @@ import static java.lang.Math.min;
 import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePlaceholders;
 
 /**
- * MvnLauncher bootstrap configuration (loaded from external properties file or system
+ * JRevolt Launcher bootstrap configuration (loaded from external properties file or system
  * properties).
  * <p/>
  * Each configuration property has its built-in default. Defaults can be either overridden
- * from command line (using {@code -DMvnLauncher.enumName=value} property syntax), or from
- * a property file specified in {@code -DMvnLauncher.defaults} property (which itself
- * defaults to {@code $ user.home}/.springboot/defaults.properties}).
+ * from command line (using {@code -Djrevolt.launcher.enumName=value} property syntax), or from
+ * a property file specified in {@code -Djrevolt.launcher.defaults} property (which itself
+ * defaults to {@code $ user.home}/.jrevolt/defaults.properties}).
  *
  * @see io.jrevolt.launcher.mvn.Launcher
  * @author Patrik Beno
@@ -56,7 +55,7 @@ import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePl
 public enum LauncherCfg {
 
 	// naming convention broken intentionally: enum name() is also property name used in
-	// -DMvnLauncher.{name}={value} or --MvnLauncher.{name}={value}
+	// -Djrevolt.launcher.{name}={value} or --jrevolt.launcher.{name}={value}
 
 	/**
 	 * Particular application home directory; Usually not current directory, not user
@@ -73,7 +72,7 @@ public enum LauncherCfg {
 	appname("JavaApp"),
 
 	/**
-	 * Properties containing MvnLauncher user-specific configuration defaults; the file,
+	 * Properties containing JRevolt Launcher user-specific configuration defaults; the file,
 	 * if exists, is loaded during initialization of this property and its values are
 	 * propagated into system properties (if not yet defined using {@code -Dname=value} on
 	 * JVM command line)
@@ -98,7 +97,7 @@ public enum LauncherCfg {
     repositories("central,jrevolt"),
 
     /**
-     * Launcher cache directory. Defaults to {@code ${user.home}/.springboot/cache}
+     * Launcher cache directory. Defaults to {@code ${user.home}/.jrevolt/cache}
      */
     cache("${user.home}/.jrevolt/cache"),
 
@@ -157,7 +156,7 @@ public enum LauncherCfg {
 	updateSnapshots(true),
 
 	/**
-	 * If reset (false), MvnLauncher checks for and downloads updates but won't actually
+	 * If reset (false), JRevolt Launcher checks for and downloads updates but won't actually
 	 * execute the application. Default: {@code true}
 	 */
 	execute(true),
@@ -242,10 +241,10 @@ public enum LauncherCfg {
 
 	/**
 	 * Return recognized system property name mapped to this enum constant; all supported
-	 * properties use common {@code MvnLauncher.*} prefix
+	 * properties use common {@code jrevolt.launcher.*} prefix
 	 */
 	public String getPropertyName() {
-        return "MvnLauncher." + name();
+        return "jrevolt.launcher." + name();
     }
 
 	/**
@@ -316,8 +315,7 @@ public enum LauncherCfg {
     static public void configure() {
 
         if (!quiet.asBoolean()) {
-            String version = Launcher.class.getPackage().getImplementationVersion();
-            Log.info("SpringBoot MvnLauncher %s", (version != null ? version : "(unknown version)"));
+            Log.info(Version.version().getVersionString());
         }
 
         // export defaults
@@ -327,10 +325,10 @@ public enum LauncherCfg {
 
 		// propagate all yet undefined foreign properties from loaded resources into
 		// system properties
-		// foreign == not MvnLauncher.*
+		// foreign == not jrevolt.launcher.*
 		String header = "Setting system properties defined in defaults:";
 		for (String pname : props.stringPropertyNames()) {
-			if (pname.startsWith("MvnLauncher.")) {
+			if (pname.startsWith("jrevolt.launcher.")) {
 				continue;
 			}
 
@@ -360,7 +358,7 @@ public enum LauncherCfg {
         validate();
 
         if (isDebugEnabled()) {
-            header = "MvnLauncher configuration:";
+            header = "JRevolt Launcher configuration:";
             for (LauncherCfg v : values()) {
                 if (header != null) {
                     Log.debug(header);
@@ -379,7 +377,7 @@ public enum LauncherCfg {
     }
 
     static public boolean isDebugEnabled() {
-		return (debug != null && debug.asBoolean()) || (debug == null && Boolean.getBoolean("MvnLauncher.debug"));
+		return (debug != null && debug.asBoolean()) || (debug == null && Boolean.getBoolean("jrevolt.launcher.debug"));
 	}
 
 	static private String list(String... properties) {

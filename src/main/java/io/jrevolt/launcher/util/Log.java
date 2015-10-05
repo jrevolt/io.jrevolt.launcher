@@ -4,7 +4,10 @@ import io.jrevolt.launcher.LauncherCfg;
 
 import java.io.PrintStream;
 
-import static io.jrevolt.launcher.util.Log.Level.*;
+import static io.jrevolt.launcher.util.Log.Level.DBG;
+import static io.jrevolt.launcher.util.Log.Level.ERR;
+import static io.jrevolt.launcher.util.Log.Level.INF;
+import static io.jrevolt.launcher.util.Log.Level.WRN;
 
 /**
  * @author <a href="mailto:patrikbeno@gmail.com">Patrik Beno</a>
@@ -56,8 +59,9 @@ public class Log {
         out().flush();
         err().flush();
         log(err(), ERR, message, args);
-        for (Throwable t = thrown ; t != null; t = t.getCause()) {
-            log(err(), ERR, "- Caused by: %s", t.getMessage());
+        int level = 0;
+        for (Throwable t = thrown ; t != null; t = t.getCause(), level++) {
+            log(err(), ERR, (level == 0) ? "%s" : "Caused by: %s", t);
         }
         if (thrown != null && LauncherCfg.debug.asBoolean()) {
             thrown.printStackTrace(err());

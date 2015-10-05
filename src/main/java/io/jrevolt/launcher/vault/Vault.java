@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
 import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePlaceholders;
 
 /**
- * SpringBoot Vault implements reusable secure data store based on asymmetric encryption.
+ * JRevolt Vault implements reusable secure data store based on asymmetric encryption.
  *
  * Keys are stored in hexadecimal encoding of the native binary Java format as provided by default implementation.
  * Further attempt to store a generally portable format has been rejected as this creates extra effort and further
@@ -65,17 +65,17 @@ public class Vault {
 
     static private final Charset UTF8 = Charset.forName("UTF-8");
 
-    static public final String USER_DATA_FILE   = "${springboot.vault.user.dataFile:${user.home}/.springboot/${vault.fname:vault}.properties}";
-    static public final String USER_CERT_FILE   = "${springboot.vault.user.certFile:${user.home}/.springboot/${vault.fname:vault}.crt}";
-    static public final String USER_CERT_TYPE   = "${springboot.vault.user.certType:X.509}";
-    static public final String USER_KEY_FILE    = "${springboot.vault.user.keyFile:${user.home}/.springboot/${vault.fname:vault}.key}";
-    static public final String USER_KEY_TYPE    = "${springboot.vault.user.keyType:RSA}";
+    static public final String USER_DATA_FILE   = "${jrevolt.vault.user.dataFile:${user.home}/.jrevolt/${vault.fname:vault}.properties}";
+    static public final String USER_CERT_FILE   = "${jrevolt.vault.user.certFile:${user.home}/.jrevolt/${vault.fname:vault}.crt}";
+    static public final String USER_CERT_TYPE   = "${jrevolt.vault.user.certType:X.509}";
+    static public final String USER_KEY_FILE    = "${jrevolt.vault.user.keyFile:${user.home}/.jrevolt/${vault.fname:vault}.key}";
+    static public final String USER_KEY_TYPE    = "${jrevolt.vault.user.keyType:RSA}";
 
-    static public final String SYSTEM_DATA_FILE = "${springboot.vault.system.dataFile:/etc/springboot/${vault.fname:vault}.properties}";
-    static public final String SYSTEM_CERT_FILE = "${springboot.vault.system.certFile:/etc/springboot/${vault.fname:vault}.crt}";
-    static public final String SYSTEM_CERT_TYPE = "${springboot.vault.system.certType:X.509}";
-    static public final String SYSTEM_KEY_FILE  = "${springboot.vault.system.keyFile:/etc/springboot/${vault.fname:vault}.key}";
-    static public final String SYSTEM_KEY_TYPE  = "${springboot.vault.system.keyType:RSA}";
+    static public final String SYSTEM_DATA_FILE = "${jrevolt.vault.system.dataFile:/etc/jrevolt/${vault.fname:vault}.properties}";
+    static public final String SYSTEM_CERT_FILE = "${jrevolt.vault.system.certFile:/etc/jrevolt/${vault.fname:vault}.crt}";
+    static public final String SYSTEM_CERT_TYPE = "${jrevolt.vault.system.certType:X.509}";
+    static public final String SYSTEM_KEY_FILE  = "${jrevolt.vault.system.keyFile:/etc/jrevolt/${vault.fname:vault}.key}";
+    static public final String SYSTEM_KEY_TYPE  = "${jrevolt.vault.system.keyType:RSA}";
 
 	static private SoftReference<Vault> INSTANCE;
 
@@ -345,7 +345,7 @@ public class Vault {
             dataFile.getParentFile().mkdirs();
             out = new FileOutputStream(dataFile);
             if (data == null) { data = new Properties(); }
-            data.store(out, "SpringBoot Vault Data");
+            data.store(out, "JRevolt Vault Data");
 		}
 		catch (IOException e) {
 			Log.error(e, "Error saving vault.");

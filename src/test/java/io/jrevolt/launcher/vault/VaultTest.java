@@ -1,11 +1,11 @@
 package io.jrevolt.launcher.vault;
 
+import io.jrevolt.launcher.url.UrlSupport;
+import io.jrevolt.launcher.util.Base64Support;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import io.jrevolt.launcher.url.UrlSupport;
-import io.jrevolt.launcher.util.Base64Support;
 import org.springframework.boot.loader.util.SystemPropertyUtils;
 import org.springframework.mock.env.MockEnvironment;
 
@@ -52,9 +52,9 @@ public class VaultTest {
             Path key = Paths.get(SystemPropertyUtils.resolvePlaceholders("${java.io.tmpdir}"), uuid, "vault.key");
             Files.copy(getClass().getResourceAsStream("/test.crt"), crt);
             Files.copy(getClass().getResourceAsStream("/test.key"), key);
-            System.setProperty("springboot.vault.user.dataFile", data.toString());
-            System.setProperty("springboot.vault.user.certFile", crt.toString());
-            System.setProperty("springboot.vault.user.keyFile", key.toString());
+            System.setProperty("jrevolt.vault.user.dataFile", data.toString());
+            System.setProperty("jrevolt.vault.user.certFile", crt.toString());
+            System.setProperty("jrevolt.vault.user.keyFile", key.toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -131,7 +131,7 @@ public class VaultTest {
 
     @Test
     public void untrusted() throws Exception {
-        Path path = Paths.get(SystemPropertyUtils.resolvePlaceholders("${springboot.vault.user.certFile}"));
+        Path path = Paths.get(SystemPropertyUtils.resolvePlaceholders("${jrevolt.vault.user.certFile}"));
         byte[] src = Files.readAllBytes(path);
         String s = new String(src).replaceFirst("(?m)(?s)---+BEGIN .*---+$(.*)^---+END .*", "$1");
         byte[] bytes = Base64Support.getMimeDecoder().decode(s);

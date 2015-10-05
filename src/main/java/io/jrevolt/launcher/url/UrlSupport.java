@@ -8,10 +8,7 @@ import java.net.URL;
 public class UrlSupport {
 
 	private static final String PROTOCOL_HANDLER = "java.protocol.handler.pkgs";
-	private static final String[] PACKAGES = {
-			"org.springframework.boot.loader",
-			"io.jrevolt.launcher.url",
-	};
+	private static final String[] PACKAGES = { "io.jrevolt.launcher.url" };
 
 	static {
 		registerUrlProtocolHandlers();
@@ -34,7 +31,7 @@ public class UrlSupport {
 	}
 
 	/**
-	 * Reset any cached handers just in case a jar protocol has already been used. We
+	 * Reset any cached handlers just in case a jar protocol has already been used. We
 	 * reset the handler by trying to set a null {@link java.net.URLStreamHandlerFactory} which
 	 * should have no effect other than clearing the handlers cache.
 	 */

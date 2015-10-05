@@ -48,7 +48,7 @@ See:
   https://github.com/jrevolt/io.jrevolt.launcher/wiki/Getting-Started
   https://github.com/jrevolt/io.jrevolt.launcher/wiki/Reference
 Generate Certificate and Private Key for sensitive data encryption:
-  $ mkdir ~/.springboot
-  $ openssl genrsa | openssl pkcs8 -topk8 -nocrypt -out ~/.springboot/vault.key
+  $ mkdir ~/.jrevolt
+  $ openssl genrsa | openssl pkcs8 -topk8 -nocrypt -out ~/.jrevolt/vault.key
   $ subject="/CN=$(whoami)@$(hostname)/OU=MyDepartment/O=MyOrganization/L=MyLocation/C=US"
-  $ openssl req -new -x509 -days 1095 -subj "$subject" -key ~/.springboot/vault.key -out ~/.springboot/vault.crt
+  $ openssl req -new -x509 -days 1095 -subj "$subject" -key ~/.jrevolt/vault.key -out ~/.jrevolt/vault.crt

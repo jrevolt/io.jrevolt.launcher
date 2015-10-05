@@ -27,10 +27,10 @@ import java.net.URL;
 /**
  * Encapsulates Maven repository information. Maven repository is is identified by user-defined ID, and contains
  * repository URL and credentials: username and password.
- * This object can save itself into {@code SpringBoot Vault}, using repository ID as key, and storing plain
+ * This object can save itself into {@code JRevolt Vault}, using repository ID as key, and storing plain
  * unencrypted URL value as reference, and user encrypted user credentials related to this repository configuration.
  * <p>
- * Values are stored under {@code springboot.mvnlauncher.repository.$repositoryId.(url|credentials)} properties, where
+ * Values are stored under {@code jrevolt.mvnlauncher.repository.$repositoryId.(url|credentials)} properties, where
  * $repositoryId refers to any user-given repository ID, and credentials containing encprypted username:password
  * tuple.
  *

@@ -38,21 +38,21 @@ public class ResolverContext implements AutoCloseable {
         int counter;
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(group, r, "SpringBoot:Launcher:Resolver#" + (++counter));
+            return new Thread(group, r, "JRevolt:Launcher:Resolver#" + (++counter));
         }
     });
     ExecutorService downloaders = Executors.newFixedThreadPool(LauncherCfg.downloaders.asInt(), new ThreadFactory() {
         int counter;
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(group, r, "SpringBoot:Launcher:Downloader#" + (++counter));
+            return new Thread(group, r, "JRevolt:Launcher:Downloader#" + (++counter));
         }
     });
 
     ScheduledExecutorService progress = Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
         @Override
         public Thread newThread(Runnable r) {
-            return new Thread(group, r, "SpringBoot:Launcher:ProgressMonitor");
+            return new Thread(group, r, "JRevolt:Launcher:ProgressMonitor");
         }
     });
 
