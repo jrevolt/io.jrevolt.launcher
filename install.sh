@@ -17,5 +17,5 @@ echo "Downloading JRevolt Updater: $url"
 wget -q -N $url
 chmod a+x update.sh
 
-./update.sh
+./update.sh $branch
 
