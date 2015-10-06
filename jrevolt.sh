@@ -5,7 +5,8 @@ error() { echo "ERROR: $*"; exit 1; }
 trap 'error ${LINENO}' ERR
 
 realpath() {
-	echo "$(cd $(dirname $1) && pwd -L)/$(basename $1)"
+	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
+	which cygpath && cygpath -w $p || echo $p
 }
 
 java=$(which java)
