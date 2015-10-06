@@ -52,4 +52,6 @@ chmod a+x $(basename $urlsh)
 
 ls -l $fjar $(basename $urlsh)
 
+date
+
 
