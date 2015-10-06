@@ -9,11 +9,11 @@ basedir="$HOME/.jrevolt"
 mkdir -p $basedir
 
 if [[ -d .git ]]; then
+  git pull
+else
   git init .
   git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
   git fetch
   git checkout dist
-else
-  git pull
 fi
 
