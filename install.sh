@@ -4,18 +4,9 @@ set -eu
 error() { echo "ERROR: $*"; exit 1; }
 trap 'error ${LINENO}' ERR
 
-repo="https://raw.githubusercontent.com/jrevolt/io.jrevolt.launcher"
-branch="${1:-master}"
+basedir="$HOME/.jrevolt"
 
-dst="$HOME/.jrevolt"
-echo "Initializing $dst directory..."
-mkdir -p $dst
-
-cd $dst
-url="$repo/$branch/bin/update.sh"
-echo "Downloading JRevolt Updater: $url"
-wget -q -N $url
-chmod a+x update.sh
-
-./update.sh $branch
+git init $basedir && cd $basedir
+git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
+git pull
 
