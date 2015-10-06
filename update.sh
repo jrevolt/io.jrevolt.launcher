@@ -48,3 +48,5 @@ wget -qN $urlsh
 chmod a+x $(basename $urlsh)
 
 ls -l $fjar $(basename $urlsh)
+
+
