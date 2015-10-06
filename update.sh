@@ -8,6 +8,8 @@ realpath() {
 	echo "$(cd $(dirname $1) && pwd -L)/$(basename $1)"
 }
 
+git pull
+
 dflt=master
 [ -f .version ] && dflt="$(cat .version)"
 
