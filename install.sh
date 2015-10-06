@@ -18,4 +18,5 @@ else
   git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
   git pull 
 fi
-./update.sh $version
+echo $version > .version
+./update.sh
