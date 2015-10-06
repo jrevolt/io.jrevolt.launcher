@@ -8,6 +8,7 @@ realpath() {
 	echo "$(cd $(dirname $1) && pwd -L)/$(basename $1)"
 }
 
+echo "Updating JRevolt Launcher scripts..."
 git pull
 
 dflt=master
@@ -35,7 +36,7 @@ urljar="${repo}/service/local/artifact/maven/redirect?r=${reponame}&g=${groupid}
 urlsh="https://raw.githubusercontent.com/${grepo}/${gversion}/bin/jrevolt.sh"
 fjar="io.jrevolt.launcher.jar"
 
-echo "Updating JRevolt Launcher..."
+echo "Updating JRevolt Launcher library..."
 cd $(dirname $0)
 
 url=$(curl -sk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
