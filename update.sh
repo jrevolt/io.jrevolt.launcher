@@ -33,7 +33,6 @@ groupid="io.jrevolt.launcher"
 artifactid="io.jrevolt.launcher"
 
 urljar="${repo}/service/local/artifact/maven/redirect?r=${reponame}&g=${groupid}&a=${artifactid}&v=${mversion}&e=jar"
-urlsh="https://raw.githubusercontent.com/${grepo}/${gversion}/bin/jrevolt.sh"
 fjar="io.jrevolt.launcher.jar"
 
 echo "Updating JRevolt Launcher library..."
@@ -46,12 +45,4 @@ wget -qN $url
 [ -L $fjar ] && rm $fjar
 ln -s $(basename $url) $fjar
 chmod 640 $fjar
-
-wget -qN $urlsh
-chmod a+x $(basename $urlsh)
-
-ls -l $fjar $(basename $urlsh)
-
-date
-
-
+echo "$(basename $url)"
