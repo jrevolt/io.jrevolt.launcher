@@ -4,6 +4,8 @@ import io.jrevolt.launcher.util.IOHelper;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.jar.Manifest;
 
 /**
@@ -13,7 +15,10 @@ public class Version {
 
     private String specificationVersion;
     private String implementationVersion;
+    private String scmBranch;
     private String scmRevision;
+    private String buildNumber;
+    private Date buildTimestamp;
 
     static public Version version() {
         Version v = new Version();
@@ -25,7 +30,11 @@ public class Version {
                     .replaceFirst("!.*", "!/META-INF/MANIFEST.MF"))
                     .openStream();
             Manifest mf = new Manifest(in);
+            v.scmBranch = mf.getMainAttributes().getValue("SCM-Branch");
             v.scmRevision = mf.getMainAttributes().getValue("SCM-Revision");
+            v.buildNumber = mf.getMainAttributes().getValue("Build-Number");
+            SimpleDateFormat sdf = new SimpleDateFormat(mf.getMainAttributes().getValue("Build-Timestamp-Format"));
+            v.buildTimestamp = sdf.parse(mf.getMainAttributes().getValue("Build-Timestamp"));
         } catch (Exception ignore) {
         } finally {
             IOHelper.close(in);
@@ -41,11 +50,23 @@ public class Version {
         return implementationVersion;
     }
 
+    public String getScmBranch() {
+        return scmBranch;
+    }
+
     public String getScmRevision() {
         return scmRevision;
     }
 
+    public String getBuildNumber() {
+        return buildNumber;
+    }
+
+    public Date getBuildTimestamp() {
+        return buildTimestamp;
+    }
+
     public String getVersionString() {
-        return String.format("JRevolt Launcher (%s)", scmRevision);
+        return String.format("JRevolt Launcher (%s, %tc)", scmRevision, buildTimestamp);
     }
 }
