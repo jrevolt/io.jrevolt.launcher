@@ -6,7 +6,7 @@ trap 'error ${LINENO}' ERR
 
 basedir="$HOME/.jrevolt"
 
-mdkir -p $basedir
+mkdir -p $basedir
 
 if [[ -d .git ]]; then
   git init .
