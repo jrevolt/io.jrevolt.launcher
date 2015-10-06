@@ -6,7 +6,7 @@ trap 'error ${LINENO}' ERR
 
 basedir="$HOME/.jrevolt"
 
-mkdir -p $basedir
+mkdir -p $basedir && cd $basedir
 
 if [[ -d .git ]]; then
   git pull
