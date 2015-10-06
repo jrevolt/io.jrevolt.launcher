@@ -12,8 +12,8 @@ if [[ -d .git ]]; then
   git pull
 else
   git init .
+  git checkout -b dist
   git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
-  git fetch
-  git checkout dist
+  git pull 
 fi
 
