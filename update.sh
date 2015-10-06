@@ -38,9 +38,6 @@ cd $(dirname $0)
 
 url=$(curl -sk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
 
-echo $urljar
-echo $url
-
 wget -qN $url
 
 [ -L $fjar ] && rm $fjar
