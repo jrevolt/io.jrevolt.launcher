@@ -4,7 +4,7 @@ set -eu
 error() { echo "ERROR: $*"; exit 1; }
 trap 'error ${LINENO}' ERR
 
-version="${1:-master}"
+version="${1:-"release/0.1.0"}"
 
 basedir="$HOME/.jrevolt"
 
