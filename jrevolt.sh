@@ -6,7 +6,7 @@ trap 'error ${LINENO}' ERR
 
 realpath() {
 	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
-	which cygpath && cygpath -w $p || echo $p
+	which cygpath >/dev/null && cygpath -w $p || echo $p
 }
 
 java=$(which java)
