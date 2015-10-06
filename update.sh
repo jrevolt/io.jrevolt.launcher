@@ -8,9 +8,12 @@ realpath() {
 	echo "$(cd $(dirname $1) && pwd -L)/$(basename $1)"
 }
 
+dflt=master
+[ -f .version ] && dflt="$(cat .version)"
+
 # github
 grepo="jrevolt/io.jrevolt.launcher"
-gversion="${1:-master}"
+gversion="${1:-$dflt}"
 
 if [[ $gversion =~ "^tag:.*" ]]; then
 	gversion="${gversion//tag:}"
