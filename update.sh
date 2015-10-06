@@ -50,6 +50,8 @@ update2() {
 	ln -s $(basename $url) $fjar
 	chmod 640 $fjar
 	echo "$(basename $url)"
+	
+	./jrevolt.sh version
 }
 
 ${@:-update1}
