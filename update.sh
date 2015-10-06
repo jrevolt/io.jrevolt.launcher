@@ -54,4 +54,3 @@ update2() {
 
 ${@:-update1}
 
-date
