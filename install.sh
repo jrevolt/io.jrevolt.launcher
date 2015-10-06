@@ -7,7 +7,7 @@ trap 'error ${LINENO}' ERR
 repo="https://raw.githubusercontent.com/jrevolt/io.jrevolt.launcher"
 branch="${1:-master}"
 
-dst="${2:-$HOME/.jrevolt}"
+dst="$HOME/.jrevolt"
 echo "Initializing $dst directory..."
 mkdir -p $dst
 
