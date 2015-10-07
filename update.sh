@@ -12,6 +12,14 @@ realpath() {
 basedir="$HOME/.jrevolt"
 defaultVersion="release/0.1.0"
 
+install() {
+	version="${1:-$defaultVersion}"
+	[ -d $basedir ] || mkdir -p $basedir
+	cd $basedir
+	echo "$version" > .version
+	update1
+}
+
 update1() {
 	[ -d $basedir ] || mkdir -p $basedir
 	cd $basedir
