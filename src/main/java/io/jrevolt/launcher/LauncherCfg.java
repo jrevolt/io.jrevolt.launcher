@@ -41,16 +41,14 @@ import static java.lang.Math.*;
 import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePlaceholders;
 
 /**
- * JRevolt Launcher bootstrap configuration (loaded from external properties file or system
- * properties).
+ * JRevolt Launcher bootstrap configuration (loaded from external properties file or system properties).
  * <p/>
- * Each configuration property has its built-in default. Defaults can be either overridden
- * from command line (using {@code -Djrevolt.launcher.enumName=value} property syntax), or from
- * a property file specified in {@code -Djrevolt.launcher.defaults} property (which itself
- * defaults to {@code $ user.home}/.jrevolt/defaults.properties}).
+ * Each configuration property has its built-in default. Defaults can be either overridden from command line (using
+ * {@code -Djrevolt.launcher.enumName=value} property syntax), or from a property file specified in {@code
+ * -Djrevolt.launcher.defaults} property (which itself defaults to {@code $ user.home}/.jrevolt/defaults.properties}).
  *
- * @see io.jrevolt.launcher.mvn.Launcher
  * @author Patrik Beno
+ * @see io.jrevolt.launcher.mvn.Launcher
  */
 public enum LauncherCfg {
 
@@ -58,10 +56,10 @@ public enum LauncherCfg {
 	// -Djrevolt.launcher.{name}={value} or --jrevolt.launcher.{name}={value}
 
 	/**
-	 * Particular application home directory; Usually not current directory, not user
-	 * directory, not a system folder. Might be an application installation folder or an
-	 * application data root folder. This one is first because it is referenced by
-	 * {@code defaults}. Defaults to ${java.home}
+	 * Particular application home directory; Usually not current directory, not user directory, not a system folder.
+	 * Might be an application installation folder or an application data root folder. This one is first because it is
+	 * referenced by {@code defaults}. Defaults to ${java.home}
+	 *
 	 * @see #defaults
 	 */
 	apphome("${java.home}"),
@@ -72,13 +70,11 @@ public enum LauncherCfg {
 	appname("JavaApp"),
 
 	/**
-	 * Properties containing JRevolt Launcher user-specific configuration defaults; the file,
-	 * if exists, is loaded during initialization of this property and its values are
-	 * propagated into system properties (if not yet defined using {@code -Dname=value} on
-	 * JVM command line)
-	 *
-	 * Keep this first to force loading of user-defined defaults before resolving other
-	 * properties
+	 * Properties containing JRevolt Launcher user-specific configuration defaults; the file, if exists, is loaded during
+	 * initialization of this property and its values are propagated into system properties (if not yet defined using
+	 * {@code -Dname=value} on JVM command line)
+	 * <p/>
+	 * Keep this first to force loading of user-defined defaults before resolving other properties
 	 */
 	defaults(list(
 			"file:jrevolt.properties", // current folder
@@ -89,44 +85,42 @@ public enum LauncherCfg {
 			"classpath:META-INF/jrevolt/defaults.properties" // application/library defaults
 	)),
 
-    /**
-     * Maven repositories to use (comma separated list).
-     * Defaults: github,central (repository URLs are automatically exported to system properties if undefined, hence
-     * providing fallback in case of missing configuration)
-     */
-    repositories("central,jrevolt"),
+	/**
+	 * Maven repositories to use (comma separated list). Defaults: github,central (repository URLs are automatically
+	 * exported to system properties if undefined, hence providing fallback in case of missing configuration)
+	 */
+	repositories("central,jrevolt"),
 
-    /**
-     * Launcher cache directory. Defaults to {@code ${user.home}/.jrevolt/cache}
-     */
-    cache("${user.home}/.jrevolt/cache"),
+	/**
+	 * Launcher cache directory. Defaults to {@code ${user.home}/.jrevolt/cache}
+	 */
+	cache("${user.home}/.jrevolt/cache"),
 
 	/**
 	 * Resolve main artifact and execute it as regular jar file (no dependencies resolution)
 	 */
 	delegate(false),
 
-    /**
-     * Enable configuration and connector logging
-     */
+	/**
+	 * Enable configuration and connector logging
+	 */
 	debug(false),
 
-    /**
-     * Supresses status line and all other messages except errors
-     */
-    quiet(false),
+	/**
+	 * Supresses status line and all other messages except errors
+	 */
+	quiet(false),
 
 	/**
-	 * If set, no artifacts are downloaded or updated from remote repository, and any
-	 * artifact may end up unresolved (NotFound). Launcher rejects incomplete class paths
-	 * and aborts, unless overriden using {@link #failOnError}.
+	 * If set, no artifacts are downloaded or updated from remote repository, and any artifact may end up unresolved
+	 * (NotFound). Launcher rejects incomplete class paths and aborts, unless overriden using {@link #failOnError}.
 	 */
 	offline(false),
 
 	/**
-	 * If set, downloads are verified using SHA1 signature provided by remote repository:
-	 * signature mismatch is considered an error, and the artifact is marked
-	 * {@code Invalid}. Enabled by default.
+	 * If set, downloads are verified using SHA1 signature provided by remote repository: signature mismatch is
+	 * considered an error, and the artifact is marked {@code Invalid}. Enabled by default.
+	 *
 	 * @see io.jrevolt.launcher.mvn.Artifact.Status#Invalid
 	 */
 	verify(true),
@@ -137,36 +131,35 @@ public enum LauncherCfg {
 	ignoreCache(false),
 
 	/**
-	 * If set, errors like missing artifacts and checksum mismatches cause launcher to
-	 * reject application execution. Enabled by default.
+	 * If set, errors like missing artifacts and checksum mismatches cause launcher to reject application execution.
+	 * Enabled by default.
 	 */
 	failOnError(true),
 
 	/**
-	 * Once downloaded, release is considered immutable and not subject to change/update
-	 * (default). Override this flag to make launcher check for remote updates of releases
-	 * (this usually leads to slower application startup and {@code NotModified} statuses
-	 * on release artifacts.
+	 * Once downloaded, release is considered immutable and not subject to change/update (default). Override this flag to
+	 * make launcher check for remote updates of releases (this usually leads to slower application startup and {@code
+	 * NotModified} statuses on release artifacts.
 	 */
 	updateReleases(false),
 
 	/**
-	 * Snapshots are considered volatile artifacts and are checked for updates (true)
-	 * unless this check is disabled (false). Disable this to speed up application startup
-	 * if you do not require latest snapshot updates, or you are aware there are no
-	 * updates available.
+	 * Snapshots are considered volatile artifacts and are checked for updates (true) unless this check is disabled
+	 * (false). Disable this to speed up application startup if you do not require latest snapshot updates, or you are
+	 * aware there are no updates available.
 	 */
 	updateSnapshots(true),
 
 	/**
-	 * If reset (false), JRevolt Launcher checks for and downloads updates but won't actually
-	 * execute the application. Default: {@code true}
+	 * If reset (false), JRevolt Launcher checks for and downloads updates but won't actually execute the application.
+	 * Default: {@code true}
 	 */
 	execute(true),
 
 	/**
-	 * Shortcut configuration property designed to force global update without the need to
-	 * separately set individual fine-graned properties. Default is {@code false}.
+	 * Shortcut configuration property designed to force global update without the need to separately set individual
+	 * fine-graned properties. Default is {@code false}.
+	 *
 	 * @see #updateSnapshots
 	 * @see #updateReleases
 	 * @see #updateInterval
@@ -176,37 +169,33 @@ public enum LauncherCfg {
 	update(false),
 
 	/**
-	 * Specifies interval (in minutes) within which result of the latest successful update
-	 * operation remains valid. This means that remote repository is checked only once in
-	 * a specified interval. In other words, if you run the application twice, it will
-	 * check for updates only once (first run). Second run will behave as if the offline
-	 * mode was enabled (no remote repository contact whatsoever, unless the dependency is
-	 * missing). Next update check will be allowed only after the specified update
-	 * interval elapsed. Default: 1 day (1440 minutes)
+	 * Specifies interval (in minutes) within which result of the latest successful update operation remains valid. This
+	 * means that remote repository is checked only once in a specified interval. In other words, if you run the
+	 * application twice, it will check for updates only once (first run). Second run will behave as if the offline mode
+	 * was enabled (no remote repository contact whatsoever, unless the dependency is missing). Next update check will be
+	 * allowed only after the specified update interval elapsed. Default: 1 day (1440 minutes)
 	 */
 	updateInterval(Long.toString(TimeUnit.DAYS.toMinutes(1))),
 
 	skipDownload(false),
 
-    resolvers("4"),
+	resolvers("4"),
 
-    downloaders("2"),
+	downloaders("2"),
 
-	retries("3"),
+	retries("3"),;
 
-    ;
+	static {
+		UrlSupport.init();
+	}
 
-    static {
-        UrlSupport.init();
-    }
-
-    static public Set<String> names() {
-        Set<String> names = new HashSet<String>();
-        for (LauncherCfg v : values()) {
-            names.add(v.name());
-        }
-        return names;
-    }
+	static public Set<String> names() {
+		Set<String> names = new HashSet<String>();
+		for (LauncherCfg v : values()) {
+			names.add(v.name());
+		}
+		return names;
+	}
 
 	private String dflt;
 
@@ -232,8 +221,7 @@ public enum LauncherCfg {
 	public void set(String value) {
 		if (value != null) {
 			System.getProperties().setProperty(getPropertyName(), value);
-		}
-		else {
+		} else {
 			System.getProperties().remove(getPropertyName());
 		}
 	}
@@ -243,12 +231,12 @@ public enum LauncherCfg {
 	}
 
 	/**
-	 * Return recognized system property name mapped to this enum constant; all supported
-	 * properties use common {@code jrevolt.launcher.*} prefix
+	 * Return recognized system property name mapped to this enum constant; all supported properties use common {@code
+	 * jrevolt.launcher.*} prefix
 	 */
 	public String getPropertyName() {
-        return "jrevolt.launcher." + name();
-    }
+		return "jrevolt.launcher." + name();
+	}
 
 	/**
 	 * Returns {@code true} if the property value is defined (i.e. not null)
@@ -259,6 +247,7 @@ public enum LauncherCfg {
 
 	/**
 	 * Returns value as {@code String}
+	 *
 	 * @return
 	 */
 	public String raw() {
@@ -269,9 +258,9 @@ public enum LauncherCfg {
 		return resolvePlaceholders(get());
 	}
 
-    public List<String> asList() {
-        return Arrays.asList(asString().split(","));
-    }
+	public List<String> asList() {
+		return Arrays.asList(asString().split(","));
+	}
 
 	public boolean asBoolean() {
 		return Boolean.parseBoolean(asString());
@@ -290,12 +279,12 @@ public enum LauncherCfg {
 	}
 
 	public URI asURI(boolean directory) {
-        try {
-            return url(asString(), directory).toURI();
-        } catch (URISyntaxException e) {
-            throw new LauncherException(e);
-        }
-    }
+		try {
+			return url(asString(), directory).toURI();
+		} catch (URISyntaxException e) {
+			throw new LauncherException(e);
+		}
+	}
 
 	public File asFile() {
 		return new File(asString());
@@ -303,28 +292,29 @@ public enum LauncherCfg {
 
 	// /
 
-    static {
-        exportRepositoryDefaults();
-    }
+	static {
+		exportRepositoryDefaults();
+	}
 
-    static public void init() {}
+	static public void init() {
+	}
 
-    static private void validate() {
-        fix(resolvers, 1, 10);
-        fix(downloaders, 1, 3);
-        fix(updateInterval, 0, Integer.MAX_VALUE);
-    }
+	static private void validate() {
+		fix(resolvers, 1, 10);
+		fix(downloaders, 1, 3);
+		fix(updateInterval, 0, Integer.MAX_VALUE);
+	}
 
-    static public void configure() {
+	static public void configure() {
 
-        if (!quiet.asBoolean()) {
-            Log.info(Version.version().getVersionString());
-        }
+		if (!quiet.asBoolean()) {
+			Log.info(Version.version().getVersionString());
+		}
 
-        // export defaults
-        export();
+		// export defaults
+		export();
 
-        Properties props = properties(LauncherCfg.defaults.get().split(","));
+		Properties props = properties(LauncherCfg.defaults.get().split(","));
 
 		// propagate all yet undefined foreign properties from loaded resources into
 		// system properties
@@ -349,8 +339,8 @@ public enum LauncherCfg {
 
 		// propagate defaults, if available
 		for (LauncherCfg v : values()) {
-            // override built-in default with value from resources
-            v.dflt = props.getProperty(v.getPropertyName(), v.dflt);
+			// override built-in default with value from resources
+			v.dflt = props.getProperty(v.getPropertyName(), v.dflt);
 
 			String value = System.getProperty(v.getPropertyName());
 			if (value == null && v.dflt != null) {
@@ -358,28 +348,30 @@ public enum LauncherCfg {
 			}
 		}
 
-        validate();
+		validate();
 
-        if (isDebugEnabled()) {
-            header = "JRevolt Launcher configuration:";
-            for (LauncherCfg v : values()) {
-                if (header != null) {
-                    Log.debug(header);
-                    header = null;
-                }
-                Log.debug("- %-30s : %s", v.getPropertyName(), SystemPropertyUtils.resolvePlaceholders(v.asString()));
-            }
-        }
+		if (isDebugEnabled()) {
+			header = "JRevolt Launcher configuration:";
+			for (LauncherCfg v : values()) {
+				if (header != null) {
+					Log.debug(header);
+					header = null;
+				}
+				Log.debug("- %-30s : %s", v.getPropertyName(), SystemPropertyUtils.resolvePlaceholders(v.asString()));
+			}
+		}
 	}
-    
-    static public void export() {
-		for (LauncherCfg v : LauncherCfg.values()) {
-            if (v.get() == null) { continue; }
-            System.setProperty(v.getPropertyName(), v.asString());
-        }
-    }
 
-    static public boolean isDebugEnabled() {
+	static public void export() {
+		for (LauncherCfg v : LauncherCfg.values()) {
+			if (v.get() == null) {
+				continue;
+			}
+			System.setProperty(v.getPropertyName(), v.asString());
+		}
+	}
+
+	static public boolean isDebugEnabled() {
 		return (debug != null && debug.asBoolean()) || (debug == null && Boolean.getBoolean("jrevolt.launcher.debug"));
 	}
 
@@ -401,26 +393,23 @@ public enum LauncherCfg {
 			if (url == null) {
 				continue;
 			}
-            StatusLine.push("Loading %s", url);
+			StatusLine.push("Loading %s", url);
 			try {
 				InputStream in = url.openStream();
 				Properties loaded = new Properties(props);
 				loaded.load(in);
 				props = loaded; // do assignment only after successful load
 				Log.debug("Loaded %s", url);
-			}
-			catch (FileNotFoundException ignore) {
+			} catch (FileNotFoundException ignore) {
 				// diagnostics: in debug mode, the "> Loaded" string is not printed...
 				// this should be enough for this case
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				if (isDebugEnabled()) {
 					e.printStackTrace();
 				}
+			} finally {
+				StatusLine.pop();
 			}
-            finally {
-                StatusLine.pop();
-            }
 		}
 		return (props != null) ? props : new Properties();
 	}
@@ -432,63 +421,67 @@ public enum LauncherCfg {
 			}
 			String resolved = resolvePlaceholders(surl).replace('\\', '/');
 			return new URL(resolved);
-		}
-		catch (MalformedURLException e) {
+		} catch (MalformedURLException e) {
 			throw new LauncherException(e, "Invalid URL: " + surl);
 		}
 	}
 
-    private static void fix(LauncherCfg cfg, int min, int max) {
-        int actual = cfg.asInt();
-        int adjusted = min(max(actual, min), max);
-        if (actual != adjusted) {
-            cfg.set(Integer.toString(adjusted));
-            Log.warn("Adjusting invalid or out of range configuration value: --%s=%s (was: %s)", cfg.name(), adjusted, actual);
-        }
-    }
+	private static void fix(LauncherCfg cfg, int min, int max) {
+		int actual = cfg.asInt();
+		int adjusted = min(max(actual, min), max);
+		if (actual != adjusted) {
+			cfg.set(Integer.toString(adjusted));
+			Log.warn("Adjusting invalid or out of range configuration value: --%s=%s (was: %s)", cfg.name(), adjusted,
+						actual);
+		}
+	}
 
-    static protected void exportRepositoryDefaults() {
-        InputStream in = null;
-        try {
-            Properties system = System.getProperties();
-            in = Main.class.getResourceAsStream("repo-defaults.properties");
-            Properties defaults = new Properties();
-            defaults.load(in);
-            Enumeration<?> names = defaults.propertyNames();
-            while (names.hasMoreElements()) {
-                String name = (String) names.nextElement();
-                if (!system.containsKey(name)) {
-                    system.setProperty(name, defaults.getProperty(name));
-                }
-            }
-        } catch (IOException ignore) {
-        } finally {
-            if (in != null) try { in.close(); } catch (IOException ignore) {}
-        }
-    }
+	static protected void exportRepositoryDefaults() {
+		InputStream in = null;
+		try {
+			Properties system = System.getProperties();
+			in = Main.class.getResourceAsStream("repo-defaults.properties");
+			Properties defaults = new Properties();
+			defaults.load(in);
+			Enumeration<?> names = defaults.propertyNames();
+			while (names.hasMoreElements()) {
+				String name = (String) names.nextElement();
+				if (!system.containsKey(name)) {
+					system.setProperty(name, defaults.getProperty(name));
+				}
+			}
+		} catch (IOException ignore) {
+		} finally {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ignore) {
+				}
+			}
+		}
+	}
 
 
-
-    ///
+	///
 
 	@Override
 	public String toString() {
 		return name() + "=" + raw();
 	}
 
-    static public boolean isConsole() {
-        return System.console() != null;
-    }
+	static public boolean isConsole() {
+		return System.console() != null;
+	}
 
-    static public boolean isCygwin() {
-        return System.console() == null && System.getenv("CYGWIN") != null;
-    }
+	static public boolean isCygwin() {
+		return System.console() == null && System.getenv("CYGWIN") != null;
+	}
 
-    static public boolean isIntelliJ() {
-        try {
-            return Class.forName("com.intellij.rt.execution.application.AppMain") != null;
-        } catch (ClassNotFoundException ignore) {
-            return false;
-        }
-    }
+	static public boolean isIntelliJ() {
+		try {
+			return Class.forName("com.intellij.rt.execution.application.AppMain") != null;
+		} catch (ClassNotFoundException ignore) {
+			return false;
+		}
+	}
 }

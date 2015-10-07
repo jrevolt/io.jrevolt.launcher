@@ -26,61 +26,62 @@ import java.net.URL;
 
 /**
  * Encapsulates Maven repository information. Maven repository is is identified by user-defined ID, and contains
- * repository URL and credentials: username and password.
- * This object can save itself into {@code JRevolt Vault}, using repository ID as key, and storing plain
- * unencrypted URL value as reference, and user encrypted user credentials related to this repository configuration.
- * <p>
+ * repository URL and credentials: username and password. This object can save itself into {@code JRevolt Vault}, using
+ * repository ID as key, and storing plain unencrypted URL value as reference, and user encrypted user credentials
+ * related to this repository configuration.
+ * <p/>
  * Values are stored under {@code jrevolt.mvnlauncher.repository.$repositoryId.(url|credentials)} properties, where
- * $repositoryId refers to any user-given repository ID, and credentials containing encprypted username:password
- * tuple.
+ * $repositoryId refers to any user-given repository ID, and credentials containing encprypted username:password tuple.
  *
  * @author Patrik Beno
  */
 public class Repository {
 
-    static public final String P_URL           = "jrevolt.launcher.repository.%s.url";
-    static public final String P_USERNAME      = "jrevolt.launcher.repository.%s.username";
-    static public final String P_PASSWORD      = "jrevolt.launcher.repository.%s.password";
+	static public final String P_URL = "jrevolt.launcher.repository.%s.url";
+	static public final String P_USERNAME = "jrevolt.launcher.repository.%s.username";
+	static public final String P_PASSWORD = "jrevolt.launcher.repository.%s.password";
 
-    static public Repository forRepositoryId(String repositoryId) {
+	static public Repository forRepositoryId(String repositoryId) {
 
-        final Vault vault = Vault.instance();
+		final Vault vault = Vault.instance();
 
-        String purl = String.format(P_URL, repositoryId);
-        String pusername = String.format(P_USERNAME, repositoryId);
-        final String ppassword = String.format(P_PASSWORD, repositoryId);
+		String purl = String.format(P_URL, repositoryId);
+		String pusername = String.format(P_USERNAME, repositoryId);
+		final String ppassword = String.format(P_PASSWORD, repositoryId);
 
-        String url = vault.getProperty(purl);
-        if (url == null) { return null; }
+		String url = vault.getProperty(purl);
+		if (url == null) {
+			return null;
+		}
 
-        String username = vault.getProperty(pusername);
-        Decryptable password = new Decryptable() {
-            @Override
-            public String getValue() {
-                return vault.getProperty(ppassword);
-            }
-        };
+		String username = vault.getProperty(pusername);
+		Decryptable password = new Decryptable() {
+			@Override
+			public String getValue() {
+				return vault.getProperty(ppassword);
+			}
+		};
 
-        return new Repository(repositoryId, URI.create(url), username, password);
-    }
+		return new Repository(repositoryId, URI.create(url), username, password);
+	}
 
-    private String id;
+	private String id;
 	private URI uri;
 	private String username;
 	private Decryptable password;
 
 	public Repository(String id, URI uri, String username, Decryptable password) {
-        this.id = id;
-        this.uri = uri;
-        this.username = username;
-        this.password = password;
-    }
+		this.id = id;
+		this.uri = uri;
+		this.username = username;
+		this.password = password;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public URI getURI() {
+	public URI getURI() {
 		return uri;
 	}
 
@@ -89,54 +90,55 @@ public class Repository {
 	}
 
 	public String getPassword() {
-        VaultPermission.READ_PERMISSION.check();
-        return password.getValue();
+		VaultPermission.READ_PERMISSION.check();
+		return password.getValue();
 	}
 
 	boolean hasPassword() {
 		return getUserName() != null && getPassword() != null;
 	}
 
-    public URL getURL() {
-        try {
-            return uri.toURL();
-        } catch (MalformedURLException e) {
-            throw new LauncherException(e);
-        }
-    }
+	public URL getURL() {
+		try {
+			return uri.toURL();
+		} catch (MalformedURLException e) {
+			throw new LauncherException(e);
+		}
+	}
 
-    ///
+	///
 
-    public void save() {
-        if (username == null) {
-            Log.info("Username is unspecified. Repository `%s` will be saved without credentials", id);
-        }
-        if (username != null && password == null) {
-            Log.error(null, "Rejecting to save credentials with empty password. Repository: `%s`, username: `%s`", id, username);
-            throw new LauncherException("Missing password");
-        }
+	public void save() {
+		if (username == null) {
+			Log.info("Username is unspecified. Repository `%s` will be saved without credentials", id);
+		}
+		if (username != null && password == null) {
+			Log.error(null, "Rejecting to save credentials with empty password. Repository: `%s`, username: `%s`", id,
+						 username);
+			throw new LauncherException("Missing password");
+		}
 
-        Vault vault = Vault.instance();
+		Vault vault = Vault.instance();
 
-        String purl = String.format(P_URL, id);
-        String pusername = String.format(P_USERNAME, id);
-        String ppassword = String.format(P_PASSWORD, id);
+		String purl = String.format(P_URL, id);
+		String pusername = String.format(P_USERNAME, id);
+		String ppassword = String.format(P_PASSWORD, id);
 
-        vault.setProperty(purl, uri.toASCIIString());
-        if (username != null) vault.setProperty(pusername, username);
-        if (password.getValue() != null) vault.setEncryptedProperty(ppassword, password.getValue());
+		vault.setProperty(purl, uri.toASCIIString());
+		if (username != null) vault.setProperty(pusername, username);
+		if (password.getValue() != null) vault.setEncryptedProperty(ppassword, password.getValue());
 
-        vault.save();
-    }
+		vault.save();
+	}
 
-    @Override
-    public String toString() {
-        final StringBuilder sb = new StringBuilder("MvnRepository{");
-        sb.append("id='").append(id).append('\'');
-        sb.append(", uri=").append(uri);
-        sb.append(", username='").append(username).append('\'');
-        sb.append(", password='").append(password).append('\'');
-        sb.append('}');
-        return sb.toString();
-    }
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder("MvnRepository{");
+		sb.append("id='").append(id).append('\'');
+		sb.append(", uri=").append(uri);
+		sb.append(", username='").append(username).append('\'');
+		sb.append(", password='").append(password).append('\'');
+		sb.append('}');
+		return sb.toString();
+	}
 }

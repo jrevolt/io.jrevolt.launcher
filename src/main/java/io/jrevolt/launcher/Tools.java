@@ -31,12 +31,15 @@ public class Tools {
 
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	static @interface Command {}
+	static @interface Command {
+	}
 
 	Map<String, Method> getCommands() {
 		Map<String, Method> commands = new HashMap<String, Method>();
 		for (Method m : getClass().getDeclaredMethods()) {
-			if (m.getAnnotation(Command.class) != null) { commands.put(m.getName(), m); }
+			if (m.getAnnotation(Command.class) != null) {
+				commands.put(m.getName(), m);
+			}
 		}
 		return commands;
 	}
@@ -119,8 +122,7 @@ public class Tools {
 			props.setProperty(key, encrypted);
 			out = new PrintWriter(System.out);
 			props.store(out, null);
-		}
-		finally {
+		} finally {
 			IOHelper.close(out);
 		}
 	}
@@ -159,8 +161,12 @@ public class Tools {
 		Formatter f = new Formatter(System.out);
 		f.format("# jrevolt.properties%n");
 		f.format(Repository.P_URL, id).format("=%s%n", url);
-		if (username != null) { f.format(Repository.P_USERNAME, id).format("=%s%n", username); }
-		if (password != null) { f.format(Repository.P_PASSWORD, id).format("=%s%n", password); }
+		if (username != null) {
+			f.format(Repository.P_USERNAME, id).format("=%s%n", username);
+		}
+		if (password != null) {
+			f.format(Repository.P_PASSWORD, id).format("=%s%n", password);
+		}
 		f.format("# EOF%n");
 	}
 
@@ -172,7 +178,9 @@ public class Tools {
 	@Command
 	void help(CommandLine cmdline) {
 		readme();
-		if (cmdline.properties().contains("help")) { System.exit(-1); }
+		if (cmdline.properties().contains("help")) {
+			System.exit(-1);
+		}
 	}
 
 	@Command
@@ -200,7 +208,12 @@ public class Tools {
 			String s = scanner.next();
 			System.out.println(s);
 		} finally {
-			if (in != null) try { in.close(); } catch (IOException ignore) {}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ignore) {
+				}
+			}
 		}
 	}
 

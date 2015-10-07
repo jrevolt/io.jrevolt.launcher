@@ -41,8 +41,7 @@ public class VaultConfiguration {
 			f.set(env, new Resolver(env.getPropertySources()));
 			env.getPropertySources().addLast(new VaultPropertySource());
 			return env;
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw new AssertionError("Cannot override environment's property resolver", e);
 		}
 	}
@@ -55,12 +54,14 @@ public class VaultConfiguration {
 			this.ctx = ctx;
 		}
 
-		@Override public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
+		@Override
+		public void postProcessBeanFactory(ConfigurableListableBeanFactory factory) throws BeansException {
 			MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
 			sources.addLast(sources.remove(PROPERTY_SOURCE_NAME));
 		}
 
-		@Override public int getOrder() {
+		@Override
+		public int getOrder() {
 			return Ordered.LOWEST_PRECEDENCE;
 		}
 	}
@@ -70,12 +71,14 @@ public class VaultConfiguration {
 			super(PROPERTY_SOURCE_NAME, Vault.instance());
 		}
 
-		@Override public String[] getPropertyNames() {
+		@Override
+		public String[] getPropertyNames() {
 			Set<String> keys = getSource().getPropertyNames();
 			return keys.toArray(new String[keys.size()]);
 		}
 
-		@Override public Object getProperty(String name) {
+		@Override
+		public Object getProperty(String name) {
 			return getSource().containsKey(name) ? getSource().getProperty(name) : null;
 		}
 	}
@@ -85,16 +88,17 @@ public class VaultConfiguration {
 			super(propertySources);
 		}
 
-		@Override protected String resolveNestedPlaceholders(String value) {
+		@Override
+		protected String resolveNestedPlaceholders(String value) {
 			return super.resolveNestedPlaceholders(value);
 		}
 
-		@Override protected String getPropertyAsRawString(String key) {
+		@Override
+		protected String getPropertyAsRawString(String key) {
 			String s;
 			if (key.matches("encrypted:[0-9a-f]+")) {
 				s = Vault.instance().resolve("${" + key + "}");
-			}
-			else {
+			} else {
 				s = super.getPropertyAsRawString(key);
 			}
 			return s;
