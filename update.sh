@@ -5,10 +5,45 @@ error() { echo "ERROR: $*"; exit 1; }
 trap 'error ${LINENO}' ERR
 
 realpath() {
-	echo "$(cd $(dirname $1) && pwd -L)/$(basename $1)"
+	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
+	which cygpath >/dev/null && cygpath -w $p || echo $p
+}
+
+basedir="$HOME/.jrevolt"
+
+install() {
+	version="${1:-"release/0.1.0"}"
+
+	basedir="$HOME/.jrevolt"
+	
+	mkdir -p $basedir && cd $basedir
+	
+	if [[ -d .git ]]; then
+		git pull
+	else
+		git init .
+		git checkout -b dist
+		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
+		git pull 
+	fi
+	echo $version > .version
+}
+
+test() {
+	echo "\$0 : $0"
 }
 
 update1() {
+	[ -d $basedir ] || mkdir -p $basedir
+	cd $basedir
+	
+	if [[ ! -d .git ]]; then
+		echo "Initializing..."
+		git init .
+		git checkout -b dist
+		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
+	fi
+	
 	echo "Updating JRevolt Launcher scripts..."
 	git pull
 	$0 update2
