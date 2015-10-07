@@ -10,28 +10,7 @@ realpath() {
 }
 
 basedir="$HOME/.jrevolt"
-
-install() {
-	version="${1:-"release/0.1.0"}"
-
-	basedir="$HOME/.jrevolt"
-	
-	mkdir -p $basedir && cd $basedir
-	
-	if [[ -d .git ]]; then
-		git pull
-	else
-		git init .
-		git checkout -b dist
-		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
-		git pull 
-	fi
-	echo $version > .version
-}
-
-test() {
-	echo "\$0 : $0"
-}
+defaultVersion="release/0.1.0"
 
 update1() {
 	[ -d $basedir ] || mkdir -p $basedir
@@ -46,17 +25,22 @@ update1() {
 	
 	echo "Updating JRevolt Launcher scripts..."
 	git pull
-	$0 update2
+	
+	./update.sh update2
 }
 
 update2() {
-	dflt=master
+	cd $basedir
+	
+	dflt=$defaultVersion
 	[ -f .version ] && dflt="$(cat .version)"
 	
 	# github
 	grepo="jrevolt/io.jrevolt.launcher"
 	gversion="${1:-$dflt}"
 	
+	[ "$gversion" = "$dflt" ] || echo "$gversion" > .version
+
 	if [[ $gversion =~ "^tag:.*" ]]; then
 		gversion="${gversion//tag:}"
 		mversion=$gversion
