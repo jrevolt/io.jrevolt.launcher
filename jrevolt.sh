@@ -14,4 +14,4 @@ jvmoptions="${JVM_OPTIONS:-}"
 file=$(realpath ~/.jrevolt/io.jrevolt.launcher.jar)
 launcheropts="${JREVOLT_LAUNCHER_OTPIONS:-}"
 
-$java $jvmoptions -jar $file $launcheropts $@
+$java $jvmoptions -jar $file $launcheropts "$@" || exit $?
