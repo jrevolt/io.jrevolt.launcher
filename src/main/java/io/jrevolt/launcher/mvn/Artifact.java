@@ -69,6 +69,7 @@ public class Artifact {
 	 * @return
 	 */
 	static public Artifact tryparse(String mvnuri) {
+		mvnuri = mvnuri.replaceFirst("@.*", ""); // trim @annotations
 		String[] it = mvnuri.split(":");
 		String g = get(it, 0, null);
 		String a = get(it, 1, null);
