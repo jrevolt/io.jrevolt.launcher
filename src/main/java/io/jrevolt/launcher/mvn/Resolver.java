@@ -181,7 +181,7 @@ public class Resolver {
 		}
 
 		String mfdeps = getManifestAttribute(archive, MF_DEPENDENCIES);
-		String[] manifestDependencies = mfdeps != null ? mfdeps.split(",") : new String[0];
+		String[] manifestDependencies = mfdeps != null ? mfdeps.split("[,\\p{Space}]") : new String[0];
 		List<Artifact> artifacts = toArtifacts(manifestDependencies);
 		return artifacts;
 	}
