@@ -469,8 +469,7 @@ public class RepositoryConnector {
 
 	private boolean isExpired(File f) {
 		final long lastUpdated = f.exists() ? f.lastModified() : 0;
-		final long validUntil = lastUpdated
-				+ (TimeUnit.MINUTES.toMillis(LauncherCfg.updateInterval.asLong()));
+		final long validUntil = lastUpdated + LauncherCfg.updateInterval.asDuration().toMillis();
 		return validUntil < System.currentTimeMillis();
 	}
 

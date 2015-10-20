@@ -57,7 +57,7 @@ public class StatusLine {
 	}
 
 	static void refresh() {
-		if (LauncherCfg.quiet.asBoolean()) {
+		if (LauncherCfg.quiet.asBoolean() || !LauncherCfg.ansi.asBoolean()) {
 			return;
 		}
 		synchronized (out()) {
@@ -68,7 +68,7 @@ public class StatusLine {
 	}
 
 	static public void resetLine() {
-		if (LauncherCfg.quiet.asBoolean()) {
+		if (LauncherCfg.quiet.asBoolean() || !LauncherCfg.ansi.asBoolean()) {
 			return;
 		}
 

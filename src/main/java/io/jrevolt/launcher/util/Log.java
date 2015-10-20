@@ -70,12 +70,13 @@ public class Log {
 	}
 
 	static private synchronized void log(final PrintStream out, Level level, String message, Object... args) {
+		boolean ansi = LauncherCfg.ansi.asBoolean();
 		StatusLine.resetLine();
-		out.print(level.ansi);
+		out.print(ansi ? level.ansi : "");
 //        out.printf("%4d [%s] ", System.currentTimeMillis() - STARTED, level);
 		out.printf("[%s] ", level);
 		out.printf(message, args);
-		out.print("\033[0m");
+		out.print(ansi ? "\033[0m" : "");
 		out.println();
 		StatusLine.refresh();
 	}

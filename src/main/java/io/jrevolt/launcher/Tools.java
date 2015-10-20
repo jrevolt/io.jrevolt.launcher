@@ -71,7 +71,6 @@ public class Tools {
 		if (artifact == null) {
 			throw new LauncherException("Expected artifactId");
 		}
-		LauncherCfg.configure();
 
 		Artifact a = Artifact.tryparse(artifact);
 
@@ -172,6 +171,8 @@ public class Tools {
 
 	@Command
 	void version(CommandLine cmdline) {
+		LauncherCfg.quiet.set("true");
+		LauncherCfg.debug.set("false");
 		System.out.println(Version.version().getVersionString());
 	}
 
@@ -185,8 +186,8 @@ public class Tools {
 
 	@Command
 	void config(CommandLine cmdline) {
-		LauncherCfg.debug.set("true");
-		LauncherCfg.configure();
+		LauncherCfg.debug.set(true);
+		LauncherCfg.report();
 	}
 
 	///
