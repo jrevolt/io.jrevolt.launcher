@@ -9,9 +9,32 @@ realpath() {
 	which cygpath >/dev/null 2>&1 && cygpath -w $p || echo $p
 }
 
-java=$(which java)
-jvmoptions="${JVM_OPTIONS:-}"
-file=$(realpath ~/.jrevolt/io.jrevolt.launcher.jar)
-launcheropts="${JREVOLT_LAUNCHER_OTPIONS:-}"
+# NOTE:
+# 1. Using arrays to properly handle white space
+# 2. "${jvmopts[@]:+${jvmopts[@]}}" syntax ix needed to properly handle empty arrays with set -u
+# 3. not all JVM options are supported
 
-$java $jvmoptions -jar $file $launcheropts "$@" || exit $?
+jvmopts=()
+launcheropts=()
+
+while true; do
+	case "${1:-}" in
+		-D*|-X*|-verbose*|-ea*|-da*|-agent*|-javaagent*)
+			jvmopts+=("$1"); shift ;;
+		--*)
+			launcheropts+=("$1"); shift ;;
+		*)
+			break ;;
+	esac
+done
+
+java=$(which java)
+file=$(realpath ~/.jrevolt/io.jrevolt.launcher.jar)
+
+$java \
+	"${jvmopts[@]:+${jvmopts[@]}}" \
+	-jar $file \
+	"${launcheropts[@]:+${launcheropts[@]}}" \
+	"$@" \
+	|| exit $?
+
