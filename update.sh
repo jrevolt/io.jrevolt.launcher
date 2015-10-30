@@ -49,15 +49,19 @@ update2() {
 	
 	[ "$gversion" = "$dflt" ] || echo "$gversion" > .version
 
-	if [[ $gversion =~ "^tag:.*" ]]; then
-		gversion="${gversion//tag:}"
-		mversion=$gversion
-		reponame=releases
-	else
-		mversion="${gversion//*\/}-SNAPSHOT"
-		reponame=snapshots
-	fi
-	
+	case "$gversion" in
+		develop|feature/*|release/*|hotfix/*)
+			# assume branch snapshot: strip prefix, if any, and append -SNAPSHOT suffix
+			mversion="${gversion//*\/}-SNAPSHOT"
+			reponame=snapshots
+			;;
+		*)
+			# assume release
+			mversion=$gversion
+			reponame=releases
+			;;
+	esac
+
 	# maven
 	repo="${2:-http://repo.jrevolt.io}"
 	groupid="io.jrevolt.launcher"
