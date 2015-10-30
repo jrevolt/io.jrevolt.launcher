@@ -31,12 +31,15 @@ public class Tools {
 
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)
-	static @interface Command {}
+	static @interface Command {
+	}
 
 	Map<String, Method> getCommands() {
 		Map<String, Method> commands = new HashMap<String, Method>();
 		for (Method m : getClass().getDeclaredMethods()) {
-			if (m.getAnnotation(Command.class) != null) { commands.put(m.getName(), m); }
+			if (m.getAnnotation(Command.class) != null) {
+				commands.put(m.getName(), m);
+			}
 		}
 		return commands;
 	}
@@ -68,7 +71,6 @@ public class Tools {
 		if (artifact == null) {
 			throw new LauncherException("Expected artifactId");
 		}
-		LauncherCfg.configure();
 
 		Artifact a = Artifact.tryparse(artifact);
 
@@ -119,8 +121,7 @@ public class Tools {
 			props.setProperty(key, encrypted);
 			out = new PrintWriter(System.out);
 			props.store(out, null);
-		}
-		finally {
+		} finally {
 			IOHelper.close(out);
 		}
 	}
@@ -159,26 +160,34 @@ public class Tools {
 		Formatter f = new Formatter(System.out);
 		f.format("# jrevolt.properties%n");
 		f.format(Repository.P_URL, id).format("=%s%n", url);
-		if (username != null) { f.format(Repository.P_USERNAME, id).format("=%s%n", username); }
-		if (password != null) { f.format(Repository.P_PASSWORD, id).format("=%s%n", password); }
+		if (username != null) {
+			f.format(Repository.P_USERNAME, id).format("=%s%n", username);
+		}
+		if (password != null) {
+			f.format(Repository.P_PASSWORD, id).format("=%s%n", password);
+		}
 		f.format("# EOF%n");
 	}
 
 	@Command
 	void version(CommandLine cmdline) {
+		LauncherCfg.quiet.set("true");
+		LauncherCfg.debug.set("false");
 		System.out.println(Version.version().getVersionString());
 	}
 
 	@Command
 	void help(CommandLine cmdline) {
 		readme();
-		if (cmdline.properties().contains("help")) { System.exit(-1); }
+		if (cmdline.properties().contains("help")) {
+			System.exit(-1);
+		}
 	}
 
 	@Command
 	void config(CommandLine cmdline) {
-		LauncherCfg.debug.set("true");
-		LauncherCfg.configure();
+		LauncherCfg.debug.set(true);
+		LauncherCfg.report();
 	}
 
 	///
@@ -200,7 +209,12 @@ public class Tools {
 			String s = scanner.next();
 			System.out.println(s);
 		} finally {
-			if (in != null) try { in.close(); } catch (IOException ignore) {}
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException ignore) {
+				}
+			}
 		}
 	}
 

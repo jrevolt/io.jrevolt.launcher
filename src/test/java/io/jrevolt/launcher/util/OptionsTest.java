@@ -1,7 +1,8 @@
 package io.jrevolt.launcher.util;
 
-import org.junit.Test;
 import org.springframework.boot.loader.util.SystemPropertyUtils;
+
+import org.junit.Test;
 
 import java.util.Properties;
 
@@ -10,14 +11,14 @@ import java.util.Properties;
  */
 public class OptionsTest {
 
-    @Test
-    public void nested() {
-        Properties props = new Properties();
-        props.setProperty("jrevolt.launcher.cfgprefix", "jrevolt.launcher");
-        props.setProperty("jrevolt.launcher.appname", "JavaApp");
-        String resolved = SystemPropertyUtils.resolvePlaceholders(props, "${${jrevolt.launcher.cfgprefix}.appname}");
-        System.out.println(resolved);
-    }
+	@Test
+	public void nested() {
+		Properties props = new Properties();
+		props.setProperty("jrevolt.launcher.cfgprefix", "jrevolt.launcher");
+		props.setProperty("jrevolt.launcher.appname", "JavaApp");
+		String resolved = SystemPropertyUtils.resolvePlaceholders(props, "${${jrevolt.launcher.cfgprefix}.appname}");
+		System.out.println(resolved);
+	}
 
 
 }

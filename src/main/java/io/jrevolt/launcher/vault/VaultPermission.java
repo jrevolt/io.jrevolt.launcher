@@ -9,16 +9,18 @@ import static java.lang.System.getSecurityManager;
  */
 public abstract class VaultPermission extends BasicPermission {
 
-    static public final VaultPermission READ_PERMISSION = new VaultPermission("read") {};
-    static public final VaultPermission WRITE_PERMISSION = new VaultPermission("write") {};
+	static public final VaultPermission READ_PERMISSION = new VaultPermission("read") {
+	};
+	static public final VaultPermission WRITE_PERMISSION = new VaultPermission("write") {
+	};
 
-    private VaultPermission(String name) {
-        super(String.format("%s.%s", Vault.class.getName(), name));
-    }
+	private VaultPermission(String name) {
+		super(String.format("%s.%s", Vault.class.getName(), name));
+	}
 
-    public void check() {
-        if (getSecurityManager() != null) {
-            getSecurityManager().checkPermission(this);
-        }
-    }
+	public void check() {
+		if (getSecurityManager() != null) {
+			getSecurityManager().checkPermission(this);
+		}
+	}
 }
