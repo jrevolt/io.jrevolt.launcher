@@ -96,7 +96,7 @@ public class RepositoryConnector {
 				StatusLine.push("Verifying connection to %s", repository.getURL().getHost());
 				try {
 					con = urlcon(repository.getURL(), false, UrlConMethod.HEAD, null);
-					con.setConnectTimeout(1000);
+					con.setConnectTimeout(2500);
 					con.connect();
 					connectionVerified = true;
 				} catch (IOException e) {
