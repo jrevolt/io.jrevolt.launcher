@@ -8,22 +8,25 @@ import java.net.URL;
 public class UrlSupport {
 
 	private static final String PROTOCOL_HANDLER = "java.protocol.handler.pkgs";
-	private static final String[] PACKAGES = { "io.jrevolt.launcher.url" };
+	private static final String[] PACKAGES = {"io.jrevolt.launcher.url"};
 
 	static {
 		registerUrlProtocolHandlers();
 	}
 
-	static public void init() {} // make sure static{} is called
+	static public void init() {
+	} // make sure static{} is called
 
 	/**
-	 * Register a {@literal 'java.protocol.handler.pkgs'} property so that a
-	 * {@link java.net.URLStreamHandler} will be located to deal with jar URLs.
+	 * Register a {@literal 'java.protocol.handler.pkgs'} property so that a {@link java.net.URLStreamHandler} will be
+	 * located to deal with jar URLs.
 	 */
 	private static void registerUrlProtocolHandlers() {
 		StringBuilder sb = new StringBuilder(System.getProperty(PROTOCOL_HANDLER, ""));
 		for (String s : PACKAGES) {
-			if (sb.length() > 0) { sb.append('|'); }
+			if (sb.length() > 0) {
+				sb.append('|');
+			}
 			sb.append(s);
 		}
 		System.setProperty(PROTOCOL_HANDLER, sb.toString());
@@ -31,13 +34,14 @@ public class UrlSupport {
 	}
 
 	/**
-	 * Reset any cached handlers just in case a jar protocol has already been used. We
-	 * reset the handler by trying to set a null {@link java.net.URLStreamHandlerFactory} which
-	 * should have no effect other than clearing the handlers cache.
+	 * Reset any cached handlers just in case a jar protocol has already been used. We reset the handler by trying to set
+	 * a null {@link java.net.URLStreamHandlerFactory} which should have no effect other than clearing the handlers
+	 * cache.
 	 */
 	private static void resetCachedUrlHandlers() {
 		try {
 			URL.setURLStreamHandlerFactory(null);
-		} catch (Error ignore) {}
+		} catch (Error ignore) {
+		}
 	}
 }

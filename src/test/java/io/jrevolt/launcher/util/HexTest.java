@@ -11,7 +11,9 @@ public class HexTest {
 	@Test
 	public void roundTrip() {
 		byte[] data = new byte[0xff];
-		for (int i = 0; i < data.length; i++) { data[i] = (byte) i; }
+		for (int i = 0; i < data.length; i++) {
+			data[i] = (byte) i;
+		}
 		char[] encoded = Hex.encode(data);
 		byte[] decoded = Hex.decode(encoded);
 		Assert.assertArrayEquals(data, decoded);

@@ -16,6 +16,7 @@
 package io.jrevolt.launcher.mvn;
 
 import io.jrevolt.launcher.LauncherException;
+
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 
@@ -54,7 +55,7 @@ public class Artifact {
 		if (a == null) {
 			throw new LauncherException(String.format(
 					"Invalid Maven artifact URI: \"%s\". " +
-					"Expected groupId:artifactId:version[:packaging[:classifier]]",
+							"Expected groupId:artifactId:version[:packaging[:classifier]]",
 					mvnuri
 			));
 		}
@@ -63,10 +64,12 @@ public class Artifact {
 
 	/**
 	 * group:artifact:version[:packaging[:classifier[:mainclass]]]
+	 *
 	 * @param mvnuri
 	 * @return
 	 */
 	static public Artifact tryparse(String mvnuri) {
+		mvnuri = mvnuri.replaceFirst("@.*", ""); // trim @annotations
 		String[] it = mvnuri.split(":");
 		String g = get(it, 0, null);
 		String a = get(it, 1, null);
@@ -83,7 +86,9 @@ public class Artifact {
 	}
 
 	static public Artifact tryFile(File f) {
-		if (!f.exists()) { return null; }
+		if (!f.exists()) {
+			return null;
+		}
 		Artifact a = new Artifact(null, null, null, null, null, null);
 		a.file = f;
 		a.status = Status.Offline;
@@ -92,7 +97,7 @@ public class Artifact {
 
 	static private String get(String[] strings, int idx, String dflt) {
 		String s = strings.length > idx ? strings[idx] : null;
-		return s != null && s.length()>0 ? s : dflt;
+		return s != null && s.length() > 0 ? s : dflt;
 	}
 
 
@@ -109,27 +114,30 @@ public class Artifact {
 
 	private URL source; // origin
 
-    private String repositoryId;
+	private String repositoryId;
 
 	private File file; // cached
 
 	private Throwable error; // resolver error, if any (for reporting purposes)
 
-    public URLConnection con;
-    public File tmp;
-    public long size;
-    public long downloaded;
-    public int requests;
+	public URLConnection con;
+	public File tmp;
+	public long size;
+	public long downloaded;
+	public int requests;
 
 
-	protected Artifact(String groupId, String artifactId, String version, String packaging, String classifier, String mainClass) {
+	protected Artifact(String groupId, String artifactId, String version, String packaging, String classifier,
+							 String mainClass) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.version = version;
 		this.packaging = packaging;
 		this.classifier = classifier;
 		this.mainClass = mainClass;
-		if (version != null) { fixupExplicitSnapshotVersion(); }
+		if (version != null) {
+			fixupExplicitSnapshotVersion();
+		}
 	}
 
 	public String getGroupId() {
@@ -186,15 +194,15 @@ public class Artifact {
 		return source;
 	}
 
-    public String getRepositoryId() {
-        return repositoryId;
-    }
+	public String getRepositoryId() {
+		return repositoryId;
+	}
 
-    public void setRepositoryId(String repositoryId) {
-        this.repositoryId = repositoryId;
-    }
+	public void setRepositoryId(String repositoryId) {
+		this.repositoryId = repositoryId;
+	}
 
-    public void setFile(File file) {
+	public void setFile(File file) {
 		this.file = file;
 	}
 
@@ -215,19 +223,18 @@ public class Artifact {
 	Archive getArchive() {
 		try {
 			return new JarFileArchive(file, file.toURI().toURL());
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			throw new RuntimeException("Cannot create archive for " + file, e);
 		}
 	}
 
 	public boolean isUpdated() {
 		switch (getStatus()) {
-		case Downloaded:
-		case Updated:
-			return true;
-		default:
-			return false;
+			case Downloaded:
+			case Updated:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -239,33 +246,33 @@ public class Artifact {
 		return !isSnapshot();
 	}
 
-    private void fixupExplicitSnapshotVersion() {
-        Pattern pattern = Pattern.compile("(.*)-\\p{Digit}{8}\\.\\p{Digit}{6}-\\p{Digit}+");
-        Matcher m = pattern.matcher(getVersion());
-        if (m.matches()) {
-            resolvedSnapshotVersion = getVersion();
+	private void fixupExplicitSnapshotVersion() {
+		Pattern pattern = Pattern.compile("(.*)-\\p{Digit}{8}\\.\\p{Digit}{6}-\\p{Digit}+");
+		Matcher m = pattern.matcher(getVersion());
+		if (m.matches()) {
+			resolvedSnapshotVersion = getVersion();
 			version = m.replaceFirst("$1-SNAPSHOT");
 		}
-    }
+	}
 
 	// /
 
 	public boolean isError() {
 		switch (status) {
-		case NotFound:
-		case Invalid:
-			return true;
-		default:
-			return false;
+			case NotFound:
+			case Invalid:
+				return true;
+			default:
+				return false;
 		}
 	}
 
 	public boolean isWarning() {
 		switch (status) {
-		case Downloadable:
-			return true;
-		default:
-			return false;
+			case Downloadable:
+				return true;
+			default:
+				return false;
 		}
 	}
 
@@ -278,44 +285,45 @@ public class Artifact {
 			return file.toURI().toString();
 		}
 		String version = resolved ? Objects.toString(resolvedSnapshotVersion, getVersion()) : getVersion();
-        StringBuilder sb = new StringBuilder()
-                .append(getGroupId()).append(':')
-                .append(getArtifactId()).append(':')
-                .append(version).append(':')
-                .append(getPackaging());
-        if (getClassifier() != null) {
-            sb.append(':').append(getClassifier());
-        }
-        return sb.toString();
+		StringBuilder sb = new StringBuilder()
+				.append(getGroupId()).append(':')
+				.append(getArtifactId()).append(':')
+				.append(version).append(':')
+				.append(getPackaging());
+		if (getClassifier() != null) {
+			sb.append(':').append(getClassifier());
+		}
+		return sb.toString();
 	}
 
 	/**
 	 * Returns the relative path of this artifact in Maven repository
+	 *
 	 * @return
 	 */
 	public String getPath() {
 		String sversion = (resolvedSnapshotVersion != null && !resolvedSnapshotVersion.isEmpty())
-                ? resolvedSnapshotVersion
-                : getVersion();
-        StringBuilder sb = new StringBuilder()
-                .append(getGroupId().replace('.', '/')).append('/')
-                .append(getArtifactId()).append('/')
-                .append(getVersion()).append('/')
-                .append(getArtifactId()).append('-').append(sversion);
-        if (getClassifier() != null) {
-            sb.append('-').append(getClassifier());
-        }
-        sb.append('.').append(getPackaging());
+				? resolvedSnapshotVersion
+				: getVersion();
+		StringBuilder sb = new StringBuilder()
+				.append(getGroupId().replace('.', '/')).append('/')
+				.append(getArtifactId()).append('/')
+				.append(getVersion()).append('/')
+				.append(getArtifactId()).append('-').append(sversion);
+		if (getClassifier() != null) {
+			sb.append('-').append(getClassifier());
+		}
+		sb.append('.').append(getPackaging());
 		return sb.toString();
 	}
 
-    public URL getUrl() {
-        try {
-            return new URL(source, getPath());
-        } catch (MalformedURLException e) {
-            throw new UnsupportedOperationException(e);
-        }
-    }
+	public URL getUrl() {
+		try {
+			return new URL(source, getPath());
+		} catch (MalformedURLException e) {
+			throw new UnsupportedOperationException(e);
+		}
+	}
 
 	@Override
 	public String toString() {
@@ -324,23 +332,30 @@ public class Artifact {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o)
+		if (this == o) {
 			return true;
-		if (o == null || getClass() != o.getClass())
+		}
+		if (o == null || getClass() != o.getClass()) {
 			return false;
+		}
 
 		Artifact that = (Artifact) o;
 
-		if (!artifactId.equals(that.artifactId))
+		if (!artifactId.equals(that.artifactId)) {
 			return false;
-		if (classifier != null ? !classifier.equals(that.classifier) : that.classifier != null)
+		}
+		if (classifier != null ? !classifier.equals(that.classifier) : that.classifier != null) {
 			return false;
-		if (!groupId.equals(that.groupId))
+		}
+		if (!groupId.equals(that.groupId)) {
 			return false;
-		if (packaging != null ? !packaging.equals(that.packaging) : that.packaging != null)
+		}
+		if (packaging != null ? !packaging.equals(that.packaging) : that.packaging != null) {
 			return false;
-		if (!version.equals(that.version))
+		}
+		if (!version.equals(that.version)) {
 			return false;
+		}
 
 		return true;
 	}

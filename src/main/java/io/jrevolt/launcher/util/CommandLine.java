@@ -10,56 +10,56 @@ import java.util.regex.Pattern;
  */
 public class CommandLine {
 
-    private Queue<String> args;
-    private Properties props;
-    private boolean stopped;
+	private Queue<String> args;
+	private Properties props;
+	private boolean stopped;
 
-    static public CommandLine parse(Queue<String> args) {
-        CommandLine cmdline = new CommandLine(args, new Properties());
-        cmdline.parse();
-        return cmdline;
-    }
+	static public CommandLine parse(Queue<String> args) {
+		CommandLine cmdline = new CommandLine(args, new Properties());
+		cmdline.parse();
+		return cmdline;
+	}
 
-    private CommandLine(Queue<String> args, Properties props) {
-        this.args = args;
-        this.props = props;
-    }
+	private CommandLine(Queue<String> args, Properties props) {
+		this.args = args;
+		this.props = props;
+	}
 
-    public Properties properties() {
-        return props;
-    }
+	public Properties properties() {
+		return props;
+	}
 
-    public Queue<String> remainder() {
-        return args;
-    }
+	public Queue<String> remainder() {
+		return args;
+	}
 
-    public boolean isStopped() {
-        return stopped;
-    }
+	public boolean isStopped() {
+		return stopped;
+	}
 
-    private void parse() {
+	private void parse() {
 
-        Pattern pattern = Pattern.compile("(?:-D|--)([^=]+)(?:=?(.*))");
+		Pattern pattern = Pattern.compile("(?:-D|--)([^=]+)(?:=?(.*))");
 
-        while (!args.isEmpty()) {
-            String s = args.peek();
+		while (!args.isEmpty()) {
+			String s = args.peek();
 
-            if (s.equals("--")) {
-                args.remove();
-                stopped = true;
-                break;
-            }
+			if (s.equals("--")) {
+				args.remove();
+				stopped = true;
+				break;
+			}
 
-            Matcher m = pattern.matcher(s);
-            if (!m.matches()) {
-                break;
-            }
+			Matcher m = pattern.matcher(s);
+			if (!m.matches()) {
+				break;
+			}
 
-            args.remove();
-            String key = m.group(1);
-            String value = m.group(2);
-            props.setProperty(key, value != null ? value : "");
-        }
-    }
+			args.remove();
+			String key = m.group(1);
+			String value = m.group(2);
+			props.setProperty(key, value != null ? value : "");
+		}
+	}
 
 }

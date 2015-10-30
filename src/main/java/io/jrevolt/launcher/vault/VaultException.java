@@ -5,11 +5,11 @@ package io.jrevolt.launcher.vault;
  */
 public class VaultException extends RuntimeException {
 
-    public VaultException(String message) {
-        super(message);
-    }
+	public VaultException(String message) {
+		super(message);
+	}
 
-    public VaultException(Throwable cause, String message) {
-        super(message, cause);
-    }
+	public VaultException(Throwable cause, String message) {
+		super(message, cause);
+	}
 }
