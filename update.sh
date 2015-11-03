@@ -10,7 +10,7 @@ realpath() {
 }
 
 basedir="$HOME/.jrevolt"
-defaultVersion="release/0.1.0"
+defaultVersion="0.1.0.RELEASE"
 
 install() {
 	version="${1:-$defaultVersion}"
