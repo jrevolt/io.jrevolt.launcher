@@ -1,16 +1,16 @@
 #!/bin/bash
 
-set -eu
-error() { echo "ERROR: $*"; exit 1; }
-trap 'error ${LINENO}' ERR
+set -u
+die() { echo "ERROR: $*"; exit 1; }
+trap 'die ${LINENO:-}' ERR
+
+basedir="$HOME/.jrevolt"
+defaultVersion="0.1.0.RELEASE"
 
 realpath() {
 	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
 	which cygpath >/dev/null 2>&1 && cygpath -w $p || echo $p
 }
-
-basedir="$HOME/.jrevolt"
-defaultVersion="0.1.0.RELEASE"
 
 install() {
 	[ -d $basedir ] || mkdir -p $basedir
@@ -24,14 +24,16 @@ update1() {
 	cd $basedir
 	
 	if [[ ! -d .git ]]; then
-		echo "Initializing..."
+		printf "%-17s ... " "Initializing"
+		{
 		git init .
 		git checkout -b dist
 		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
+		} >/dev/null 2>&1 && printf "OK\n" || die
 	fi
-	
-	echo "Updating JRevolt Launcher scripts..."
-	git pull
+
+	printf "%-17s ... " "Updating scripts"
+	git pull >/dev/null 2>&1 && printf "OK\n" || die
 	
 	./update.sh update2 "$@"
 }
@@ -70,7 +72,9 @@ update2() {
 	urljar="${repo}/service/local/artifact/maven/redirect?r=${reponame}&g=${groupid}&a=${artifactid}&v=${mversion}&e=jar"
 	fjar="io.jrevolt.launcher.jar"
 	
-	echo "Updating JRevolt Launcher library..."
+	printf "%-17s ... " "Updating binaries"
+	
+	{
 	cd $(dirname $0)
 	
 	url=$(curl -sk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
@@ -80,9 +84,9 @@ update2() {
 	[ -L $fjar ] && rm $fjar
 	ln -s $(basename $url) $fjar
 	chmod 640 $fjar
-	echo "$(basename $url)"
+	} >> $basedir/update.log 2>&1 && printf "OK\n" || die
 	
-	./jrevolt.sh version
+	printf "%-17s ... %s\n" "Current version" "$(./jrevolt.sh version)"
 }
 
 ${@:-update1}
