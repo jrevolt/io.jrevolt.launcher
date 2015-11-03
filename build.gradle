@@ -41,10 +41,9 @@ println "Building ${project.version} (${gitDescribe}, build: ${buildNumber}, tim
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'maven'
-apply plugin: 'distribution'
+apply plugin: 'maven-publish'
 
-// WARNING: Gradle 1.11 uses ASM that does not yet support bytecode produced with -parameters. Tests will fail
-//[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
+[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
 
 buildDir = "${rootProject.projectDir}/.build/${project.name}"
 sourceSets {
@@ -81,15 +80,6 @@ repositories {
 	maven { url "${cfg.repository}" }
 }
 
-// FIXME QDH don't know yet how to get rid of distZip and distTar artifacts
-configurations.archives.artifacts.with { archives ->
-	new ArrayList(archives).each {
-		if (it.file.name.matches('.*(zip|tar)$')) {
-			remove(it)
-		}
-	}
-}
-
 jar {
 	manifest {
 		attributes(
@@ -104,11 +94,25 @@ jar {
 	}
 }
 
-uploadArchives {
+task sourceJar(type: Jar) {
+	from sourceSets.main.allJava
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			artifact sourceJar {
+				classifier "sources"
+			}
+		}
+	}
 	repositories {
-		mavenDeployer {
-			repository(url: Boolean.valueOf("${release}") ? "$cfg.releases" : "$cfg.snapshots") {
-				authentication(userName: "$cfg.deploymentUserName", password: "$cfg.deploymentPassword")
+		maven {
+			url Boolean.valueOf("${release}") ? "$cfg.releases" : "$cfg.snapshots"
+			credentials {
+				username "$cfg.deploymentUserName"
+				password "$cfg.deploymentPassword"
 			}
 		}
 	}
