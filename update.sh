@@ -13,11 +13,11 @@ basedir="$HOME/.jrevolt"
 defaultVersion="0.1.0.RELEASE"
 
 install() {
-	version="${1:-$defaultVersion}"
+	version="${1:-}"
 	[ -d $basedir ] || mkdir -p $basedir
 	cd $basedir
-	echo "$version" > .version
-	update1
+	[ -f $basedir/.version ] && rm $basedir/.version
+	update1 $version
 }
 
 update1() {
@@ -34,18 +34,19 @@ update1() {
 	echo "Updating JRevolt Launcher scripts..."
 	git pull
 	
-	./update.sh update2
+	./update.sh update2 $version
 }
 
 update2() {
 	cd $basedir
 	
+	version="${1:-}"
 	dflt=$defaultVersion
 	[ -f .version ] && dflt="$(cat .version)"
 	
 	# github
 	grepo="jrevolt/io.jrevolt.launcher"
-	gversion="${1:-$dflt}"
+	gversion="${version:-$dflt}"
 	
 	[ "$gversion" = "$dflt" ] || echo "$gversion" > .version
 
