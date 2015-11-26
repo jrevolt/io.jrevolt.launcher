@@ -419,9 +419,10 @@ public class RepositoryConnector {
 			final boolean expired = isExpired(fLastUpdated);
 
 			// should we try and update?
-			boolean update = LauncherCfg.update.asBoolean()
+			boolean update = !LauncherCfg.offline.asBoolean() && (
+					LauncherCfg.update.asBoolean()
 					|| (LauncherCfg.updateSnapshots.asBoolean() && expired
-					|| LauncherCfg.ignoreCache.asBoolean());
+					|| LauncherCfg.ignoreCache.asBoolean()));
 
 			// metadata
 			if (update) {
