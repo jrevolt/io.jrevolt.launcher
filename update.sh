@@ -4,7 +4,13 @@ set -u
 die() { echo "ERROR: $*"; exit 1; }
 trap 'die ${LINENO:-}' ERR
 
-which git >/dev/null 2>&1 || die "Missing: git"
+checkdep() {
+	which "$1" >/dev/null 2>&1 || die "Missing $1"
+}
+
+checkdep git
+checkdep curl
+checkdep wget
 
 basedir="$HOME/.jrevolt"
 defaultVersion="0.1.0.RELEASE"
