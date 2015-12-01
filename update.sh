@@ -5,12 +5,10 @@ die() { echo "ERROR: $*"; exit 1; }
 trap 'die ${LINENO:-}' ERR
 
 checkdep() {
-	which "$1" >/dev/null 2>&1 || die "Missing $1"
+	for i in "$@"; do which "$i" >/dev/null 2>&1 || die "Missing $i"; done
 }
 
-checkdep git
-checkdep curl
-checkdep wget
+checkdep curl wget git java
 
 basedir="$HOME/.jrevolt"
 defaultVersion="0.1.0.RELEASE"
