@@ -29,14 +29,15 @@ update1() {
 	[ -d $basedir ] || mkdir -p $basedir
 	cd $basedir
 	
-	curl -sk --head --fail https://github.com >> $basedir/update.log || die $LINENO "Network issues; github.com. See update.log"
+	local repo="https://github.com"
+	curl -sk --head --fail $repo >> $basedir/update.log || die $LINENO "Network issues: $repo. See update.log"
 	
 	if [[ ! -d .git ]]; then
 		printf "%-17s ... " "Initializing"
 		{
 		git init .
 		git checkout -b dist
-		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
+		git remote add -t dist origin $repo/jrevolt/io.jrevolt.launcher.git
 		} >> $basedir/update.log 2>&1 && printf "OK\n" || die $LINENO "Could not initialize repository. See update.log"
 	fi
 
@@ -77,7 +78,7 @@ update2() {
 	groupid="io.jrevolt.launcher"
 	artifactid="io.jrevolt.launcher"
 	
-	curl -sk --head --fail https://$repo >> $basedir/update.log || die $LINENO "Network issues: $repo. See update.log"
+	curl -sk --head --fail $repo >> $basedir/update.log || die $LINENO "Network issues: $repo. See update.log"
 	
 	urljar="${repo}/service/local/artifact/maven/redirect?r=${reponame}&g=${groupid}&a=${artifactid}&v=${mversion}&e=jar"
 	fjar="io.jrevolt.launcher.jar"
