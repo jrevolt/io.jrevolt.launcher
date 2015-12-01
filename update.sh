@@ -4,6 +4,8 @@ set -u
 die() { echo "ERROR: $*"; exit 1; }
 trap 'die ${LINENO:-}' ERR
 
+which git >/dev/null 2>&1 || die "Missing: git"
+
 basedir="$HOME/.jrevolt"
 defaultVersion="0.1.0.RELEASE"
 
