@@ -29,6 +29,8 @@ update1() {
 	[ -d $basedir ] || mkdir -p $basedir
 	cd $basedir
 	
+	curl -sk --head --fail https://github.com >> $basedir/update.log || die $LINENO "Network issues; github.com. See update.log"
+	
 	if [[ ! -d .git ]]; then
 		printf "%-17s ... " "Initializing"
 		{
@@ -74,6 +76,8 @@ update2() {
 	repo="${2:-http://repo.jrevolt.io}"
 	groupid="io.jrevolt.launcher"
 	artifactid="io.jrevolt.launcher"
+	
+	curl -sk --head --fail https://$repo >> $basedir/update.log || die $LINENO "Network issues: $repo. See update.log"
 	
 	urljar="${repo}/service/local/artifact/maven/redirect?r=${reponame}&g=${groupid}&a=${artifactid}&v=${mversion}&e=jar"
 	fjar="io.jrevolt.launcher.jar"
