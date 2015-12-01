@@ -35,11 +35,11 @@ update1() {
 		git init .
 		git checkout -b dist
 		git remote add -t dist origin https://github.com/jrevolt/io.jrevolt.launcher.git
-		} >/dev/null 2>&1 && printf "OK\n" || die
+		} >> $basedir/update.log 2>&1 && printf "OK\n" || die $LINENO "Could not initialize repository. See update.log"
 	fi
 
 	printf "%-17s ... " "Updating scripts"
-	git pull >/dev/null 2>&1 && printf "OK\n" || die
+	git pull >> $basedir/update.log 2>&1 && printf "OK\n" || die $LINENO "Error updating repository. See update.log"
 	
 	./update.sh update2 "$@"
 }
@@ -90,7 +90,7 @@ update2() {
 	[ -L $fjar ] && rm $fjar
 	ln -s $(basename $url) $fjar
 	chmod 640 $fjar
-	} >> $basedir/update.log 2>&1 && printf "OK\n" || die
+	} >> $basedir/update.log 2>&1 && printf "OK\n" || die $LINENO "Error downloading library. See update.log"
 	
 	printf "%-17s ... %s\n" "Current version" "$(./jrevolt.sh version)"
 }
