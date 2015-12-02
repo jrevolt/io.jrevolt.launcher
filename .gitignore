@@ -1,3 +1,5 @@
+/vault.key
+/vault.crt
 /*.jar
 /.version
 /.subject
