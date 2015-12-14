@@ -137,6 +137,7 @@ public class ResolverContext implements AutoCloseable {
 	}
 
 	boolean isDownloadAllowed(Artifact artifact) {
+		if (LauncherCfg.offline.asBoolean()) { return false; }
 		return !LauncherCfg.skipDownload.asBoolean() || artifact.equals(this.main);
 	}
 

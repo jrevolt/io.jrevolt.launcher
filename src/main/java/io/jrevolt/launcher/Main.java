@@ -19,6 +19,7 @@ import io.jrevolt.launcher.url.UrlSupport;
 import io.jrevolt.launcher.util.CommandLine;
 import io.jrevolt.launcher.util.Log;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Properties;
 import java.util.Queue;
@@ -47,7 +48,8 @@ public class Main {
 			Thread.currentThread().setName("JRevolt:Launcher");
 			new Main().launch(new LinkedList<String>(asList(args)));
 		} catch (LauncherException e) {
-			Log.error(e, "Could not launch application!");
+			Log.error(e, "Could not launch application! %s",
+						 Arrays.asList(LauncherCfg.offline, LauncherCfg.skipDownload));
 			System.exit(-1);
 		}
 	}
