@@ -132,7 +132,7 @@ public class Resolver {
 
 			File f = download().get().getArtifact().getFile();
 
-			if (f == null) {
+			if (f == null || !f.exists()) {
 				throw new LauncherException(
 						getArtifact().getError(),
 						"Cannot resolve %s (status: %s)", getArtifact(), getArtifact().getStatus());

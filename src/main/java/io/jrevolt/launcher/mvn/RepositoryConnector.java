@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 import static io.jrevolt.launcher.mvn.Artifact.Status.Downloaded;
 import static io.jrevolt.launcher.util.IOHelper.close;
@@ -81,6 +80,8 @@ public class RepositoryConnector {
 	 * If the connection to repository seems invalid, throw an exception
 	 */
 	void verifyConnection() {
+		if (LauncherCfg.offline.asBoolean()) throw new AssertionError("LauncherCfg.offline=true");
+
 		if (connectionVerified) {
 			return;
 		}
@@ -322,6 +323,8 @@ public class RepositoryConnector {
 	}
 
 	void download(final Artifact artifact, final URLConnection con, final File file) throws IOException {
+		if (LauncherCfg.offline.asBoolean()) throw new AssertionError("LauncherCfg.offline=true");
+
 		artifact.setStatus(Artifact.Status.Downloading);
 		file.getParentFile().mkdirs();
 		for (int attempt = 1; attempt <= retries && !artifact.getStatus().equals(Downloaded); attempt++) {
@@ -416,12 +419,17 @@ public class RepositoryConnector {
 			File mfile = new File(new File(context.cache, artifact.getPath()).getParentFile(), "maven-metadata.xml");
 			File fLastUpdated = getLastUpdatedMarkerFile(mfile);
 
+			if (LauncherCfg.offline.asBoolean() && !mfile.exists()) {
+				return;
+			}
+
 			final boolean expired = isExpired(fLastUpdated);
 
 			// should we try and update?
-			boolean update = LauncherCfg.update.asBoolean()
+			boolean update = !LauncherCfg.offline.asBoolean() && (
+					LauncherCfg.update.asBoolean()
 					|| (LauncherCfg.updateSnapshots.asBoolean() && expired
-					|| LauncherCfg.ignoreCache.asBoolean());
+					|| LauncherCfg.ignoreCache.asBoolean()));
 
 			// metadata
 			if (update) {
@@ -431,13 +439,14 @@ public class RepositoryConnector {
 			long lastModified = isAvailable(metadata) ? metadata.getLastModified() : mfile.lastModified();
 			if (update) artifact.requests++;
 
-			// latest snapshot version from metadata
-			String snapshotVersion;
 
 			// is our local copy up to date?
-			boolean recent = mfile.exists() && mfile.lastModified() >= lastModified;
+			boolean recent = mfile.exists() && (mfile.lastModified() >= lastModified || LauncherCfg.offline.asBoolean());
 
 			boolean downloadAllowed = context.isDownloadAllowed(artifact);
+
+			// latest snapshot version from metadata
+			String snapshotVersion;
 
 			if (!recent) {
 				File tmp = new File(mfile.getParentFile(), UUID.randomUUID().toString() + ".tmp");
@@ -582,6 +591,7 @@ public class RepositoryConnector {
 	}
 
 	private URLConnection urlcon(URL url, UrlConMethod method, Long ifModifiedSince) {
+		if (LauncherCfg.offline.asBoolean()) throw new AssertionError("LauncherCfg.offline=true");
 		return urlcon(url, !connectionVerified, method, ifModifiedSince);
 	}
 
@@ -598,6 +608,10 @@ public class RepositoryConnector {
 				hcon.setRequestMethod(method.name());
 				if (ifModifiedSince != null) {
 					hcon.setIfModifiedSince(ifModifiedSince);
+				}
+				// bypass proxy cache (@see #20)
+				if (LauncherCfg.ignoreCache.asBoolean()) {
+					hcon.setRequestProperty("Cache-Control", "no-cache");
 				}
 			}
 
