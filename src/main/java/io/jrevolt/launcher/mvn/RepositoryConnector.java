@@ -609,6 +609,10 @@ public class RepositoryConnector {
 				if (ifModifiedSince != null) {
 					hcon.setIfModifiedSince(ifModifiedSince);
 				}
+				// bypass proxy cache (@see #20)
+				if (LauncherCfg.ignoreCache.asBoolean()) {
+					hcon.setRequestProperty("Cache-Control", "no-cache");
+				}
 			}
 
 			// credentials are lazily initialized in #verifyConnection()
