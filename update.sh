@@ -11,7 +11,7 @@ checkdep() {
 checkdep curl wget git java
 
 basedir="$HOME/.jrevolt"
-defaultVersion="0.1.0.RELEASE"
+defaultVersion="0.2.0.RELEASE"
 
 realpath() {
 	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
