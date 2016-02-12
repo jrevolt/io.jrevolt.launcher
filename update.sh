@@ -88,7 +88,7 @@ update2() {
 	{
 	cd $(dirname $0)
 	
-	url=$(curl -sk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
+	url=$(curl -svk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
 	
 	wget -qN $url
 	
