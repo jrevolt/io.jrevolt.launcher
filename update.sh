@@ -90,7 +90,7 @@ update2() {
 	
 	url=$(curl -svk --head "$urljar" | grep "Location:" | sed "s/Location: //" | tr -d '\r')
 	
-	wget -qN $url
+	wget -qN --no-check-certificate $url
 	
 	[ -L $fjar ] && rm $fjar
 	ln -s $(basename $url) $fjar
