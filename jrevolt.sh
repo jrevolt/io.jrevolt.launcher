@@ -4,6 +4,8 @@ set -eu
 error() { echo "ERROR: $*"; exit 1; }
 trap 'error ${LINENO}' ERR
 
+launcher="${JREVOLT_LAUNCHER_JAR:-$HOME/.jrevolt/io.jrevolt.launcher.jar}"
+
 realpath() {
 	p="$(cd $(dirname $1) && pwd -L)/$(basename $1)"
 	which cygpath >/dev/null 2>&1 && cygpath -w $p || echo $p
@@ -29,7 +31,7 @@ while true; do
 done
 
 java=$(which java)
-file=$(realpath ~/.jrevolt/io.jrevolt.launcher.jar)
+file=$(realpath $launcher)
 
 $java \
 	"${jvmopts[@]:+${jvmopts[@]}}" \
