@@ -1,3 +1,6 @@
+Installation
+============
+
 See [Requirements](../Requirements)
 
 `
