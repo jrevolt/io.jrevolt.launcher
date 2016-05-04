@@ -2,20 +2,28 @@
 Installation
 ============
 
-See [Requirements](../Requirements)
+Default installation::
 
-`
-$ curl -sL https://goo.gl/yy2UxF | bash 
-`
+	$ curl -sL https://goo.gl/yy2UxF | bash
 
-To install specific version:
+To install specific version::
 
-`
-$ curl -sL https://goo.gl/yy2UxF | bash -ls install <version>
-`
+	$ curl -sL https://goo.gl/yy2UxF | bash -ls install <version>
 
-or
+or::
 
-`
-$ ~/.jrevolt/update.sh install <version>
-`
+	$ ~/.jrevolt/update.sh install <version>
+
+
+------
+Docker
+------
+
+::
+
+	$ docker run jrevolt/launcher
+
+
+-------
+Updates
+-------
