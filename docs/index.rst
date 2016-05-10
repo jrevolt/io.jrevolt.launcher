@@ -2,7 +2,7 @@
 Welcome to JRevolt Launcher
 ===========================
 
-This is home of **JRevolt Launcher**, *Java Application Launcher with Maven Repository Support*.
+This is the home of **JRevolt Launcher**, *Java Application Launcher with Maven Repository Support*.
 
 Contents:
 
