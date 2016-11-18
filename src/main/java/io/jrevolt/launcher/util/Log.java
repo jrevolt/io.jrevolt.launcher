@@ -24,7 +24,11 @@ public class Log {
 	static private final long STARTED = System.currentTimeMillis();
 
 	static public boolean isDebug() {
-		return LauncherCfg.isDebugEnabled();
+		return isLevelEnabled(DBG);
+	}
+
+	static public boolean isLevelEnabled(Level level) {
+		return level.ordinal() >= Level.valueOf(LauncherCfg.loglevel.get()).ordinal();
 	}
 
 	static public synchronized void log(Level level, String message, Object... args) {
@@ -70,10 +74,12 @@ public class Log {
 	}
 
 	static private synchronized void log(final PrintStream out, Level level, String message, Object... args) {
+		if (LauncherCfg.quiet.asBoolean()) { return; }
+		if (!isLevelEnabled(level)) { return; }
+
 		boolean ansi = LauncherCfg.ansi.asBoolean();
 		StatusLine.resetLine();
 		out.print(ansi ? level.ansi : "");
-//        out.printf("%4d [%s] ", System.currentTimeMillis() - STARTED, level);
 		out.printf("[%s] ", level);
 		out.printf(message, args);
 		out.print(ansi ? "\033[0m" : "");

@@ -9,6 +9,7 @@ import org.springframework.mock.env.MockEnvironment;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -131,7 +132,7 @@ public class VaultTest {
 	}
 
 
-	@Test
+	@Test @Ignore
 	public void untrusted() throws Exception {
 		Path path = Paths.get(SystemPropertyUtils.resolvePlaceholders("${jrevolt.vault.user.certFile}"));
 		byte[] src = Files.readAllBytes(path);

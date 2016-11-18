@@ -39,11 +39,11 @@ project.version = isRelease ? releaseVersion : snapshotVersion
 println "Building ${project.version} (${gitDescribe}, build: ${buildNumber}, timestamp:${buildTimestamp})"
 
 apply plugin: 'java'
-apply plugin: 'spring-boot'
+//apply plugin: 'spring-boot'
 apply plugin: 'maven'
 apply plugin: 'maven-publish'
 
-[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters']
+[compileJava, compileTestJava]*.options*.compilerArgs = ['-parameters', '-Xlint:unchecked']
 
 buildDir = "${rootProject.projectDir}/.build/${project.name}"
 sourceSets {
@@ -51,18 +51,17 @@ sourceSets {
 	test { [java, resources]*.srcDir 'src/test/java'; }
 }
 
-
 configurations {
 	deploy
 }
 
-springBoot {
-	backupSource = false
-}
+//springBoot {
+//	backupSource = false
+//}
 
-bootRepackage {
-	customConfiguration = "deploy"
-}
+//bootRepackage {
+//	customConfiguration = "deploy"
+//}
 
 dependencies {
 	compile("org.springframework.boot:spring-boot-starter:${springBootVersion}")
@@ -90,7 +89,11 @@ jar {
 				"Build-Number": "${buildNumber}",
 				"Build-Timestamp": "${buildTimestamp}",
 				"Build-Timestamp-Format": "${buildTimestampFormat}",
+				"Main-Class": "io.jrevolt.launcher.Main",
 		)
+	}
+	from {
+		configurations.deploy.collect { it.isDirectory() ? it : zipTree(it) }
 	}
 }
 

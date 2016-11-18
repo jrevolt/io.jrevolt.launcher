@@ -162,7 +162,7 @@ public class Launcher {
 			}
 			Log.debug("##");
 		}
-		LauncherCfg.export();
+		//LauncherCfg.export(); // TODO review this
 
 		if (mainClass == null) {
 			throw new LauncherException("Missing Main-Class in manifest");

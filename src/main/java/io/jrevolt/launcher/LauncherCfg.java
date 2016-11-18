@@ -1,18 +1,3 @@
-/*
- * Copyright 2012-2014 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package io.jrevolt.launcher;
 
 import io.jrevolt.launcher.url.UrlSupport;
@@ -39,11 +24,10 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.function.Supplier;
 
 import static java.lang.Math.*;
+import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
-import static org.springframework.boot.loader.util.SystemPropertyUtils.resolvePlaceholders;
 
 /**
  * JRevolt Launcher bootstrap configuration (loaded from external properties file or system properties).
@@ -61,6 +45,11 @@ public enum LauncherCfg {
 	// -Djrevolt.launcher.{name}={value} or --jrevolt.launcher.{name}={value}
 
 	/**
+	 * Particular application name, typically base name of the script
+	 */
+	appname,
+
+	/**
 	 * Particular application home directory; Usually not current directory, not user directory, not a system folder.
 	 * Might be an application installation folder or an application data root folder. This one is first because it is
 	 * referenced by {@code defaults}. Defaults to ${java.home}
@@ -69,19 +58,26 @@ public enum LauncherCfg {
 	 */
 	apphome,
 
-	/**
-	 * Particular application name, typically base name of the script
-	 */
-	appname,
+	mode, // (user|system)
 
 	/**
-	 * Properties containing JRevolt Launcher user-specific configuration defaults; the file, if exists, is loaded during
-	 * initialization of this property and its values are propagated into system properties (if not yet defined using
-	 * {@code -Dname=value} on JVM command line)
-	 * <p/>
-	 * Keep this first to force loading of user-defined defaults before resolving other properties
+	 * - {@code ${user.home}/.jrevolt}
+	 * - {@code /etc/jrevolt}
 	 */
-	defaults,
+	conf,
+
+	/**
+	 * Launcher cache directory. Defaults to
+	 * - {@code ${user.home}/.jrevolt/cache}
+	 * - {@code /var/cache/jrevolt}
+	 */
+	cache,
+
+	/**
+	 * - {@code ${user.home}/.jrevolt/logs}
+	 * - {@code /var/log/jrevolt}
+	 */
+	logs,
 
 	/**
 	 * Maven repositories to use (comma separated list). Defaults: github,central (repository URLs are automatically
@@ -89,31 +85,11 @@ public enum LauncherCfg {
 	 */
 	repositories,
 
-	/**
-	 * Launcher cache directory. Defaults to {@code ${user.home}/.jrevolt/cache}
-	 */
-	cache,
 
 	/**
 	 * Resolve main artifact and execute it as regular jar file (no dependencies resolution)
 	 */
 	delegate,
-
-	/**
-	 * Enable configuration and connector logging
-	 */
-	debug,
-
-	/**
-	 * Supresses status line and all other messages except errors
-	 */
-	quiet,
-
-	/**
-	 * Enables ANSI coloring sequences in logging; When false, status line is disabled (as it depends on availability
-	 * of ANSI sequences)
-	 */
-	ansi,
 
 	/**
 	 * If set, no artifacts are downloaded or updated from remote repository, and any artifact may end up unresolved
@@ -189,76 +165,123 @@ public enum LauncherCfg {
 
 	retries,
 
+	/// logging & output
+
+	loglevel,
+
+	/**
+	 * Enable configuration and connector logging
+	 */
+	debug,
+
+	/**
+	 * Supresses status line and all other messages except errors
+	 */
+	quiet,
+
+	/**
+	 * Enables ANSI coloring sequences in logging; When false, status line is disabled (as it depends on availability
+	 * of ANSI sequences)
+	 */
+	ansi,
+
 	;
 
-	static private final Properties DEFAULTS;
+	static private enum Mode { user, system }
+
+	static private class MyProperties extends Properties {
+		public MyProperties(Properties defaults) {
+			super(defaults);
+		}
+		void setDefaults(Properties props) {
+			this.defaults = props;
+		}
+	}
+
+	static private final String PROPERTY_NAME_PREFIX = "jrevolt.launcher.";
+
+	static private final Properties DEFAULTS, DEFAULTS_USER, DEFAULTS_SYSTEM;
 
 	/**
 	 * per context class loader configuration
 	 */
-	static private final Map<ClassLoader, Properties> LOADED;
+	static private final Map<ClassLoader, Properties> CONTEXT = new WeakHashMap<>();
 
-	/**
-	 * per context class loader configuration
-	 */
-	static private final Map<ClassLoader, Properties> CONTEXT;
-
-	static private final Supplier<String> UNCONFIGURED;
 
 	static {
-		// todo review this
+
 		UrlSupport.init();
-		LauncherCfg.exportRepositoryDefaults();
-		LOADED = new WeakHashMap<>();
-		LOADED.put(ClassLoader.getSystemClassLoader(), new Properties());
-		CONTEXT = new WeakHashMap<>();
-		CONTEXT.put(ClassLoader.getSystemClassLoader(), new Properties());
-		UNCONFIGURED = () -> String.format(
-				"JRevolt Launcher unconfigured! Context: %s", ClassLoader.getSystemClassLoader());
-		DEFAULTS = properties(null, String.format(
-				"classpath:%s.properties", LauncherCfg.class.getName().replace('.','/')));
-		configure();
+
+		// pre-boot config
+		ClassLoader cl = ClassLoader.getSystemClassLoader();
+		CONTEXT.put(cl, new Properties());
+
+		//noinspection UnusedLabel
+		loadDefaults: {
+			String path = LauncherCfg.class.getName().replace('.', '/');
+			DEFAULTS = load(format("classpath:%s.properties", path), null);
+			DEFAULTS_USER = load(format("classpath:%s-user.properties", path), DEFAULTS);
+			DEFAULTS_SYSTEM = load(format("classpath:%s-system.properties", path), DEFAULTS);
+			CONTEXT.put(cl, new Properties(DEFAULTS_USER));
+		}
 	}
 
-	static private Properties properties(Map<ClassLoader, Properties> ctx) {
-		return requireNonNull(properties(ctx, null), UNCONFIGURED);
+	static public void init() {} // just to make sure static{} is called
+
+	static private Properties properties() {
+		return properties(Thread.currentThread().getContextClassLoader());
 	}
 
-	static private Properties properties(Map<ClassLoader, Properties> ctx, ClassLoader loader) {
+	static private Properties properties(ClassLoader loader) {
+//		loader = Optional.ofNullable(loader)
+//				.orElseGet(()->Optional.ofNullable(Thread.currentThread().getContextClassLoader())
+//						.orElseGet(ClassLoader::getSystemClassLoader));
+		if (loader == null) {
+			loader = Thread.currentThread().getContextClassLoader();
+		}
 		if (loader == null) {
 			loader = ClassLoader.getSystemClassLoader();
 		}
-		Properties props = ctx.get(loader);
+		Properties props = CONTEXT.get(loader);
 		if (props != null) {
 			return props;
 		}
 		if (loader.getParent() != null) {
-			return properties(ctx, loader.getParent());
+			return properties(loader.getParent());
 		}
-		return null;
+		return System.getProperties();
 	}
 
 	static public Set<String> names() {
-		Set<String> names = new HashSet<String>();
+		Set<String> names = new HashSet<>();
 		for (LauncherCfg v : values()) {
 			names.add(v.name());
 		}
 		return names;
 	}
 
-	// /
+	///
 
 	public String get() {
-		String pname = getPropertyName();
-		return properties(CONTEXT).getProperty(pname, properties(LOADED).getProperty(pname));
+		return get(getPropertyName(), true);
+	}
+
+	static String get(String pname, boolean resolve) {
+		return get(properties(), pname, resolve);
+	}
+
+	static String get(Properties props, String pname, boolean resolve) {
+		String value = SystemPropertyUtils.getProperty(pname, props.getProperty(pname));
+		String resolved = resolve ? SystemPropertyUtils.resolvePlaceholders(props, value) : null;
+		return resolve ? resolved : value;
 	}
 
 	public void set(String value) {
 		if (value != null) {
-			properties(CONTEXT).setProperty(getPropertyName(), value);
+			properties().setProperty(getPropertyName(), value);
 		} else {
 			// todo will this work as expected in properties cascade?
-			properties(CONTEXT).remove(getPropertyName());
+			properties().remove(getPropertyName());
 		}
 	}
 
@@ -271,7 +294,7 @@ public enum LauncherCfg {
 	 * jrevolt.launcher.*} prefix
 	 */
 	public String getPropertyName() {
-		return "jrevolt.launcher." + name();
+		return PROPERTY_NAME_PREFIX + name();
 	}
 
 	/**
@@ -287,7 +310,7 @@ public enum LauncherCfg {
 	 * @return
 	 */
 	public String raw() {
-		return get();
+		return get(getPropertyName(), false);
 	}
 
 	public String asString() {
@@ -326,12 +349,19 @@ public enum LauncherCfg {
 		return new File(asString());
 	}
 
+	public String asFileUri() {
+		return "file:"+get();
+	}
+
 	public Duration asDuration() {
 		return Duration.parse(asString());
 	}
 
+	public void export() {
+		System.setProperty(getPropertyName(), properties().getProperty(getPropertyName()));
+	}
 
-	// /
+	///
 
 	static private void validate() {
 		fix(resolvers, 1, 10);
@@ -348,46 +378,48 @@ public enum LauncherCfg {
 			contextClassLoader = ClassLoader.getSystemClassLoader();
 		}
 
-		Properties loaded = properties(DEFAULTS, Objects.toString(LauncherCfg.defaults.get(),"").split(","));
-		Properties context = new Properties(System.getProperties());
+		Log.info(Version.version().getVersionString());
 
-		LOADED.put(contextClassLoader, loaded);
-		CONTEXT.put(contextClassLoader, context);
+		MyProperties conf = load(LauncherCfg.conf.asFileUri(), DEFAULTS);
+		CONTEXT.put(contextClassLoader, conf);
+		switch (Mode.valueOf(LauncherCfg.mode.get())) {
+			case user: conf.setDefaults(DEFAULTS_USER); break;
+			case system: conf.setDefaults(DEFAULTS_SYSTEM); break;
+		}
+		exportSystemProperties(properties());
 
 		validate();
 	}
 
-	static public void report() {
-		Log.info(Version.version().getVersionString());
 
+	static public void report(boolean resolved) {
 		if (isDebugEnabled()) {
-			String header = "JRevolt Launcher configuration:";
+			String header = format("JRevolt Launcher configuration:");
 			for (LauncherCfg v : values()) {
 				if (header != null) {
 					Log.debug(header);
 					header = null;
 				}
-				Log.debug("- %-32s : %s", v.getPropertyName(), SystemPropertyUtils.resolvePlaceholders(v.asString()));
+				Log.debug("- %-32s : %s", v.getPropertyName(), resolved ? v.asString() : v.raw());
 			}
 		}
 	}
 
-	static public void export() {
-		export(System.getProperties());
-	}
-
-	static public Properties export(Properties props) {
-		for (LauncherCfg v : LauncherCfg.values()) {
-			if (v.get() == null) {
-				continue;
-			}
-			props.setProperty(v.getPropertyName(), v.asString());
-		}
-		return props;
+	static private void exportSystemProperties(Properties props) {
+		Log.debug("Overriding system properties");
+		Properties sysprops = System.getProperties();
+		props.stringPropertyNames().stream()
+				.filter(name->!name.startsWith(PROPERTY_NAME_PREFIX))
+				.filter(name->!sysprops.containsKey(name))
+				.forEach(name->{
+					String value = props.getProperty(name);
+					Log.debug(" - %s = %s", name, value);
+					sysprops.setProperty(name, value);
+				});
 	}
 
 	static public boolean isDebugEnabled() {
-		return (debug != null && debug.asBoolean()) || (debug == null && Boolean.getBoolean("jrevolt.launcher.debug"));
+		return Log.isLevelEnabled(Log.Level.DBG) || debug.asBoolean();
 	}
 
 	static private String list(String... properties) {
@@ -399,6 +431,10 @@ public enum LauncherCfg {
 			sb.append(s);
 		}
 		return sb.toString();
+	}
+
+	static private Properties properties(String... uris) {
+		return properties(properties(), uris);
 	}
 
 	static private Properties properties(Properties defaults, String... uris) {
@@ -413,23 +449,34 @@ public enum LauncherCfg {
 			}
 			StatusLine.push("Loading %s", url);
 			try {
-				InputStream in = url.openStream();
-				Properties loaded = new Properties(props);
-				loaded.load(in);
-				props = loaded; // do assignment only after successful load
+				props = load(url, props);
 				Log.debug("Loaded %s", url);
-			} catch (FileNotFoundException ignore) {
-				// diagnostics: in debug mode, the "> Loaded" string is not printed...
-				// this should be enough for this case
-			} catch (IOException e) {
-				if (isDebugEnabled()) {
-					e.printStackTrace();
-				}
 			} finally {
 				StatusLine.pop();
 			}
 		}
 		return (props != null) ? props : new Properties();
+	}
+
+	static private MyProperties load(String url, Properties defaults) {
+		return load(url(url), defaults);
+
+	}
+
+	static private MyProperties load(URL url, Properties defaults) {
+		try (InputStream in = url.openStream()) {
+			MyProperties props = new MyProperties(defaults);
+			props.load(in);
+			return props;
+		} catch (FileNotFoundException ignore) {
+			return new MyProperties(defaults);
+		} catch (IOException e) {
+			throw new LauncherException(e);
+		}
+	}
+
+	static private URL url(String surl) {
+		return url(surl, false);
 	}
 
 	static private URL url(String surl, boolean isDirectory) {
@@ -490,6 +537,13 @@ public enum LauncherCfg {
 		}
 	}
 
+	static private String resolvePlaceholders(String text) {
+		return resolvePlaceholders(properties(), text);
+	}
+
+	static private String resolvePlaceholders(Properties props, String text) {
+		return SystemPropertyUtils.resolvePlaceholders(props, text);
+	}
 
 	///
 

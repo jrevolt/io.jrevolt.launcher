@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.jar.Manifest;
 
 /**
@@ -67,6 +68,8 @@ public class Version {
 	}
 
 	public String getVersionString() {
-		return String.format("JRevolt Launcher (%s, %tc)", scmRevision, buildTimestamp);
+		return String.format("JRevolt Launcher (%s, %tc)",
+									Optional.ofNullable(scmRevision).orElse("SNAPSHOT"),
+									Optional.ofNullable(buildTimestamp).orElse(new Date()));
 	}
 }

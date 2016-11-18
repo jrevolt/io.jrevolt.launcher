@@ -21,6 +21,7 @@ import io.jrevolt.launcher.util.Log;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Set;
@@ -34,19 +35,25 @@ import static java.util.Arrays.asList;
  */
 public class Main {
 
+	static private class Action {
+		Command cmd;
+		CommandLine cmdline;
+
+		Action(Command cmd, CommandLine cmdline) {
+			this.cmd = cmd;
+			this.cmdline = cmdline;
+		}
+	}
+
 	static {
 		UrlSupport.init();
 	}
 
-	/**
-	 * Application entry point. Delegates to {@code launch()}
-	 *
-	 * @see #launch(Queue)
-	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		try {
 			Thread.currentThread().setName("JRevolt:Launcher");
-			new Main().launch(new LinkedList<String>(asList(args)));
+			Action action = new Main().prepare(new LinkedList<>(asList(args)));
+			action.cmd.run(action.cmdline);
 		} catch (LauncherException e) {
 			Log.error(e, "Could not launch application! %s",
 						 Arrays.asList(LauncherCfg.offline, LauncherCfg.skipDownload));
@@ -54,34 +61,34 @@ public class Main {
 		}
 	}
 
-	/**
-	 * Process arguments and delegate to {@code MvnLauncher}
-	 *
-	 * @param args
-	 * @see io.jrevolt.launcher.mvn.Launcher
-	 */
-	protected void launch(Queue<String> args) throws LauncherException {
+	<T extends Command>
+	Action prepare(Queue<String> args) {
+
+		String cmd;
+		Class<? extends Command> type;
+		Command command;
+		Map<String, Class<T>> commands = Command.getCommands();
 
 		CommandLine cmdline = CommandLine.parse(args);
-		Tools tools = new Tools();
-
-		String cmd = cmdline.remainder().peek();
+		cmd = cmdline.remainder().peek();
 
 		// undefined command or --help required
 		if (cmd == null || cmdline.properties().contains("help")) {
-			cmd = "help";
+			type = Command.Help.class;
 
-		} else if (tools.supports(cmd)) { // standard supported command
+		} else if (commands.containsKey(cmd)) { // standard supported command
 			cmdline.remainder().remove();
+			type = commands.get(cmd);
 
 		} else { // unsupported command or an artifactId (assume `launch` command)
-			cmd = "launch";
+			type = Command.Launch.class;
 		}
 
-		exportOptions(cmdline.properties());
-		cmdline = CommandLine.parse(cmdline.remainder());
-		tools.invoke(cmd, cmdline);
+		command = Command.create(type);
 
+		exportOptions(cmdline.properties());
+
+		return new Action(command, CommandLine.parse(cmdline.remainder()));
 	}
 
 	void exportOptions(Properties properties) {
